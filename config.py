@@ -6,8 +6,10 @@ from aiogram.client.default import DefaultBotProperties
 
 @dataclass
 class Config:
-    # Токен телеграм-бота
-    TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
+    # Токен телеграм-бота t.me/esim_unity_bot
+    TOKEN = "7210348872:AAGDZsDcTsAszxGEhCNBCmmZkbSRC5n868c"
+    # Токен тестового телеграм-бота t.me/vdghasda_bot
+    TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
     BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # БД
