@@ -11,6 +11,7 @@ class Config:
     # Токен тестового телеграм-бота t.me/vdghasda_bot
     TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
+    # TODO: Всегда проверять какой токен я пушу или деплою (должен стоять TOKEN)
     BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # БД
     DB_HOST = "localhost"
