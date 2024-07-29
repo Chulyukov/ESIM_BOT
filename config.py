@@ -12,7 +12,10 @@ class Config:
     TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
     # TODO: Всегда проверять какой токен я пушу или деплою (должен стоять TOKEN)
-    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    # BNESIM креды
+    BNESIM_PARTNER_LOGIN = "nikita.admin"
+    BNESIM_API_KEY = "pe2mp9qxcen9"
     # БД
     DB_HOST = "localhost"
     DB_NAME = "esim_db"
@@ -27,14 +30,12 @@ class Config:
     # YOKASSA TOKEN
     YUKASSA_LIVE_TOKEN = "390540012:LIVE:36227"
     # Наценка для русской карты
-    PRICE_1_GB_RUB = 199
     PRICE_3_GB_RUB = 249
     PRICE_5_GB_RUB = 499
     PRICE_10_GB_RUB = 699
     PRICE_20_GB_RUB = 999
     # Наценка для звезд
-    PRICE_1_GB_STAR = 10
-    PRICE_3_GB_STAR = 25
-    PRICE_5_GB_STAR = 40
-    PRICE_10_GB_STAR = 85
-    PRICE_20_GB_STAR = 180
+    PRICE_3_GB_STAR = 1
+    PRICE_5_GB_STAR = 1
+    PRICE_10_GB_STAR = 1
+    PRICE_20_GB_STAR = 60
