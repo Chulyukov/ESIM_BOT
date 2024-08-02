@@ -12,7 +12,9 @@ class Config:
     TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
     # TODO: Всегда проверять какой токен я пушу или деплою (должен стоять TOKEN)
-    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    # Тестовый токен YOKASSA
+    YOKASSA_TEST_TOKEN = "381764678:TEST:91407"
     # BNESIM креды
     BNESIM_PARTNER_LOGIN = "nikita.admin"
     BNESIM_API_KEY = "pe2mp9qxcen9"
@@ -29,13 +31,5 @@ class Config:
     CHANNEL_LINK = "@esim\_unity"
     # YOKASSA TOKEN
     YUKASSA_LIVE_TOKEN = "390540012:LIVE:36227"
-    # Наценка для русской карты
-    PRICE_3_GB_RUB = 249
-    PRICE_5_GB_RUB = 499
-    PRICE_10_GB_RUB = 699
-    PRICE_20_GB_RUB = 999
-    # Наценка для звезд
-    PRICE_3_GB_STAR = 1
-    PRICE_5_GB_STAR = 1
-    PRICE_10_GB_STAR = 1
-    PRICE_20_GB_STAR = 60
+    # Курс евро
+    EURO_EXCHANGE_RATE = 95

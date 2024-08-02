@@ -1,3 +1,5 @@
+import json
+
 from db.db_connection import execute_query
 
 
@@ -32,10 +34,10 @@ def db_get_data_volume(chat_id):
 
 def db_get_data_country(chat_id):
     """Получаем users.data.country"""
-    result = execute_query("Ошибка при получении users.data.country",
-                           "SELECT JSON_EXTRACT(data, '$.country') AS country FROM users WHERE chat_id = %s",
-                           (chat_id,))[0][0]
-    return result if result else None
+    result = json.loads(execute_query("Ошибка при получении users.data.country",
+                           "SELECT data FROM users WHERE chat_id = %s",
+                           (chat_id,))[0][0])
+    return result["country"].replace("\"", "") if result else None
 
 
 def db_get_all_data(chat_id):
@@ -43,4 +45,4 @@ def db_get_all_data(chat_id):
     result = execute_query("Ошибка при получении users.data.country & volume",
                            "SELECT JSON_EXTRACT(data, '$.country', '$.volume') FROM users WHERE chat_id = %s",
                            (chat_id,))[0][0]
-    return result if result else None
+    return json.loads(result) if result else None

@@ -4,8 +4,7 @@ import logging
 from aiogram import Dispatcher
 
 from config import Config
-from core.commands.buy_esim import buy_esim_handlers
-from core.commands.get_my_esims import get_my_esims_handlers
+from core.commands import get_my_esims_handlers, buy_esim_handlers
 from core.commands.menu import menu_handlers
 from core.commands.start import start_handlers
 
