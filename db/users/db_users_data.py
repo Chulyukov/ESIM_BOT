@@ -35,8 +35,8 @@ def db_get_data_volume(chat_id):
 def db_get_data_country(chat_id):
     """Получаем users.data.country"""
     result = json.loads(execute_query("Ошибка при получении users.data.country",
-                           "SELECT data FROM users WHERE chat_id = %s",
-                           (chat_id,))[0][0])
+                                      "SELECT data FROM users WHERE chat_id = %s",
+                                      (chat_id,))[0][0])
     return result["country"].replace("\"", "") if result else None
 
 

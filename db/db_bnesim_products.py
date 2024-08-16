@@ -32,5 +32,3 @@ def db_get_product_id(country, volume):
                            "SELECT product_id FROM bnesim_products WHERE country = %s AND volume = %s",
                            (country, volume,))[0][0]
     return result if result else None
-
-

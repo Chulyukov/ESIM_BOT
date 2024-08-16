@@ -102,7 +102,8 @@ async def successful_payment(message: types.Message):
                 await asyncio.sleep(1)
             db_clean_data(chat_id)
             await Config.BOT.delete_message(chat_id=message.chat.id, message_id=downloading_message.message_id)
-            await Config.BOT.send_photo(chat_id=message.chat.id, photo=BufferedInputFile(active_esim[1], "png_qr_code.png"),
+            await Config.BOT.send_photo(chat_id=message.chat.id, photo=BufferedInputFile(active_esim[1],
+                                                                                         "png_qr_code.png"),
                                         caption="*🎊 Успешное приобретение вашей первой eSIM!*"
                                                 "\n\n☎️ *Название вашей eSIM:*"
                                                 f" `{data[0].capitalize()} - {active_esim[0][-4:]}`"
@@ -132,7 +133,8 @@ async def successful_payment(message: types.Message):
                 await asyncio.sleep(1)
             db_clean_data(chat_id)
             await Config.BOT.delete_message(chat_id=message.chat.id, message_id=downloading_message.message_id)
-            await Config.BOT.send_photo(chat_id=message.chat.id, photo=BufferedInputFile(active_esim[1], "png_qr_code.png"),
+            await Config.BOT.send_photo(chat_id=message.chat.id, photo=BufferedInputFile(active_esim[1],
+                                                                                         "png_qr_code.png"),
                                         caption="🎊 Спасибо за приобретение новой eSIM!"
                                                 "\n\n📛 *Название вашей eSIM:*"
                                                 f" `{data[0].capitalize()} - {active_esim[0][-4:]}` "

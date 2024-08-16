@@ -20,14 +20,14 @@ async def update_products():
         new_value = new_data.get(product_id)
 
         if old_value != new_value:
-            text = (f"Изменения для product\_id {product_id}:")
+            text = f"Изменения для product\_id {product_id}:"
             if old_value is None:
-                text += (f"\n\nНовая запись: {new_value}")
+                text += f"\n\nНовая запись: {new_value}"
             elif new_value is None:
-                text += (f"\nУдалена запись: {old_value}")
+                text += f"\nУдалена запись: {old_value}"
             else:
-                text += (f"\nСтарое значение: {old_value}")
-                text += (f"\nНовое значение: {new_value}")
+                text += f"\nСтарое значение: {old_value}"
+                text += f"\nНовое значение: {new_value}"
     try:
         await Config.BOT.send_message("1547142782", text)
     except Exception as e:

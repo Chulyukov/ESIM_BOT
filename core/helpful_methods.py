@@ -29,7 +29,8 @@ async def buy_esim_service(msg):
     kb = build_keyboard(buttons, (2,))
 
     message_text = (
-        "🚨 *Перед тем, как выбрать страну, обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
+        "🚨 *Перед тем, как выбрать страну,"
+        " обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
         "\nВы можете проверить это, следуя шагам из инструкции по ссылке: *ссылка на Telegraph*"
         "\n\n👇*Выберите одну из доступных стран (список стран со временем будет активно пополняться).*"
     )
@@ -47,24 +48,26 @@ def build_keyboard(buttons, adjust_params):
 
 
 def get_plan_prices(currency, chat_id, is_top_up=False):
-    if is_top_up:
-        country = db_get_top_up_data_country(chat_id)
-    else:
-        country = db_get_data_country(chat_id)
+    # Определяем страну в зависимости от флага is_top_up
+    country = db_get_top_up_data_country(chat_id) if is_top_up else db_get_data_country(chat_id)
+
+    # Получаем данные о ценах
     price_data = db_get_price_data(country)
-    if currency == 'RUB':
-        return {
-            3: int(float(price_data[3]["price"]) * float(price_data[3]["percentage_of_profit"]) * 1.047 * Config.EURO_EXCHANGE_RATE),
-            5: int(float(price_data[5]["price"]) * float(price_data[5]["percentage_of_profit"]) * 1.047 * Config.EURO_EXCHANGE_RATE),
-            10: int(float(price_data[10]["price"]) * float(price_data[10]["percentage_of_profit"]) * 1.047 * Config.EURO_EXCHANGE_RATE),
-            20: int(float(price_data[20]["price"]) * float(price_data[20]["percentage_of_profit"]) * 1.047 * Config.EURO_EXCHANGE_RATE),
-        }
-    return {
-        3: int(float(price_data[3]["price"]) * float(price_data[3]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
-        5: int(float(price_data[5]["price"]) * float(price_data[5]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
-        10: int(float(price_data[10]["price"]) * float(price_data[10]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
-        20: int(float(price_data[20]["price"]) * float(price_data[20]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
-    }
+
+    # Определяем множитель в зависимости от валюты
+    multiplier = (
+        1.047 * Config.EURO_EXCHANGE_RATE if currency == 'RUB'
+        else Config.EURO_EXCHANGE_RATE / 1.3
+    )
+
+    # Рассчитываем цены для каждого плана
+    prices = {}
+    for plan in [3, 5, 10, 20]:
+        price = float(price_data[plan]["price"])
+        percentage_of_profit = float(price_data[plan]["percentage_of_profit"])
+        prices[plan] = int(price * percentage_of_profit * multiplier)
+
+    return prices
 
 
 async def pay_service(callback: CallbackQuery, currency, is_top_up=False):

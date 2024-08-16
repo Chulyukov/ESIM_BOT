@@ -24,7 +24,7 @@ async def donate(msg: Message | CallbackQuery):
     else:
         await msg.answer(text="*🎗️ Здесь вы можете сделать пожертвование на развитие нашего проекта."
                               "\n🙏 Ваш вклад особенно ценен для нас.*",
-                            reply_markup=kb)
+                         reply_markup=kb)
 
 
 @router.callback_query(F.data.startswith("donate_choose_amount_"))
@@ -62,7 +62,8 @@ async def donate_pay(callback: CallbackQuery):
         # 'photo_width': 416,
         # 'photo_height': 416,
         'is_flexible': False,
-        'prices': [types.LabeledPrice(label=f"eSIM payment using {currency}", amount=amount * 100 if currency == 'RUB' else amount)],
+        'prices': [types.LabeledPrice(label=f"eSIM payment using {currency}",
+                                      amount=amount * 100 if currency == 'RUB' else amount)],
         'payload': "test-invoice-payload"
     }
 

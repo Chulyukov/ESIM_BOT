@@ -44,7 +44,8 @@ async def get_my_esims(message: Message):
         kb = kb.adjust(1).as_markup()
         await Config.BOT.delete_message(chat_id=message.chat.id, message_id=downloading_message.message_id)
         await message.answer(
-            text="*👇 Выберите одну из ваших eSIM, чтобы узнать подробную информацию о ней или продлить пакет интернета.*",
+            text="*👇 Выберите одну из ваших eSIM,"
+                 " чтобы узнать подробную информацию о ней или продлить пакет интернета.*",
             reply_markup=kb
         )
 
