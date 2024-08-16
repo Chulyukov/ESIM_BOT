@@ -1,9 +1,12 @@
 import asyncio
-from difflib import unified_diff
+
+from loguru import logger
 
 from bnesim_api import BnesimApi
 from config import Config
 from db.db_bnesim_products import db_get_bnesim_products
+
+logger.add('../logs/update_bnesim_products.log', level='DEBUG', format='{time} | {level} | {name} | {message}')
 
 
 async def update_products():
@@ -25,6 +28,9 @@ async def update_products():
             else:
                 text += (f"\nСтарое значение: {old_value}")
                 text += (f"\nНовое значение: {new_value}")
-    await Config.BOT.send_message("1547142782", text)
+    try:
+        await Config.BOT.send_message("1547142782", text)
+    except Exception as e:
+        logger.error(f"Произошла ошибка при отправке сообщения пользователю с chat_id=1547142782: {e}")
 
 asyncio.run(update_products())

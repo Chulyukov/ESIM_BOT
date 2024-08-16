@@ -12,7 +12,7 @@ class Config:
     TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
     # TODO: Всегда проверять какой токен я пушу или деплою (должен стоять TOKEN)
-    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # Тестовый токен YOKASSA
     YOKASSA_TEST_TOKEN = "381764678:TEST:91407"
     # BNESIM креды
@@ -32,4 +32,4 @@ class Config:
     # YOKASSA TOKEN
     YUKASSA_LIVE_TOKEN = "390540012:LIVE:36227"
     # Курс евро
-    EURO_EXCHANGE_RATE = 95
+    EURO_EXCHANGE_RATE = 100

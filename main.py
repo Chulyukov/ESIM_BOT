@@ -4,9 +4,7 @@ import logging
 from aiogram import Dispatcher
 
 from config import Config
-from core.commands import get_my_esims_handlers, buy_esim_handlers
-from core.commands.menu import menu_handlers
-from core.commands.start import start_handlers
+from core.commands import buy_esim, get_my_esims, donate, menu, start
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,10 +14,11 @@ bot = Config.BOT
 async def main() -> None:
     dp = Dispatcher()
 
-    dp.include_router(buy_esim_handlers.router)
-    dp.include_router(get_my_esims_handlers.router)
-    dp.include_router(menu_handlers.router)
-    dp.include_router(start_handlers.router)
+    dp.include_router(buy_esim.router)
+    dp.include_router(get_my_esims.router)
+    dp.include_router(donate.router)
+    dp.include_router(menu.router)
+    dp.include_router(start.router)
 
     await dp.start_polling(bot)
 

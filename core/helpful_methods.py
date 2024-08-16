@@ -6,8 +6,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import Config
 from db.db_bnesim_products import db_get_price_data
-from db.db_data import db_get_data_country, db_update_data_volume
-from db.db_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
+from db.users.db_users_data import db_get_data_country, db_update_data_volume
+from db.users.db_users_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
     db_update_top_up_flag_true, db_update_top_up_flag_false
 
 
@@ -21,15 +21,15 @@ def get_username(message):
 
 async def buy_esim_service(msg):
     buttons = [
-        InlineKeyboardButton(text="🇹🇷Турция", callback_data="choose_plan_rub_turkey"),
-        InlineKeyboardButton(text="🇹🇭Тайланд", callback_data="choose_plan_rub_thailand"),
-        InlineKeyboardButton(text="🇬🇪Грузия", callback_data="choose_plan_rub_georgia"),
-        InlineKeyboardButton(text="🇪🇬Египет", callback_data="choose_plan_rub_egypt")
+        InlineKeyboardButton(text="🇹🇷Турция", callback_data="choose_payment_method_turkey"),
+        InlineKeyboardButton(text="🇹🇭Тайланд", callback_data="choose_payment_method_thailand"),
+        InlineKeyboardButton(text="🇬🇪Грузия", callback_data="choose_payment_method_georgia"),
+        InlineKeyboardButton(text="🇪🇬Египет", callback_data="choose_payment_method_egypt")
     ]
     kb = build_keyboard(buttons, (2,))
 
     message_text = (
-        "🚨 Перед тем, как выбрать страну, *обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
+        "🚨 *Перед тем, как выбрать страну, обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
         "\nВы можете проверить это, следуя шагам из инструкции по ссылке: *ссылка на Telegraph*"
         "\n\n👇*Выберите одну из доступных стран (список стран со временем будет активно пополняться).*"
     )
@@ -60,10 +60,10 @@ def get_plan_prices(currency, chat_id, is_top_up=False):
             20: int(float(price_data[20]["price"]) * float(price_data[20]["percentage_of_profit"]) * 1.047 * Config.EURO_EXCHANGE_RATE),
         }
     return {
-        3: int(float(price_data[3]["price"]) * float(price_data[3]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 2.40),
-        5: int(float(price_data[5]["price"]) * float(price_data[5]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 2.40),
-        10: int(float(price_data[10]["price"]) * float(price_data[10]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 2.40),
-        20: int(float(price_data[20]["price"]) * float(price_data[20]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 2.40),
+        3: int(float(price_data[3]["price"]) * float(price_data[3]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
+        5: int(float(price_data[5]["price"]) * float(price_data[5]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
+        10: int(float(price_data[10]["price"]) * float(price_data[10]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
+        20: int(float(price_data[20]["price"]) * float(price_data[20]["percentage_of_profit"]) * Config.EURO_EXCHANGE_RATE / 1.3),
     }
 
 

@@ -26,3 +26,11 @@ def db_get_price_data(country: str):
     return {data[0]: {"percentage_of_profit": data[1], "price": data[2]} for data in result}
 
 
+def db_get_product_id(country, volume):
+    """Получаем product_id"""
+    result = execute_query("Ошибка при получении product_id",
+                           "SELECT product_id FROM bnesim_products WHERE country = %s AND volume = %s",
+                           (country, volume,))[0][0]
+    return result if result else None
+
+

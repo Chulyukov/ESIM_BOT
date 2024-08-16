@@ -1,4 +1,5 @@
 import mysql.connector
+from loguru import logger
 
 from config import Config
 
@@ -13,8 +14,8 @@ def get_database_connection():
             database=Config.DB_NAME
         )
         return connection
-    except mysql.connector.Error as error:
-        print(error)
+    except mysql.connector.Error as err:
+        logger.error("Проблема с подключением к БД: ", err)
 
 
 def execute_query(err_msg, query, params=None):
@@ -27,10 +28,8 @@ def execute_query(err_msg, query, params=None):
         cursor.execute(query, params)
         result = cursor.fetchall()
         return result
-    except mysql.connector.Error as error:
-        print(err_msg)
-        print(error)
-        print()
+    except mysql.connector.Error as err:
+        logger.error(err_msg, ':', err)
         return None
     finally:
         connection.commit()
