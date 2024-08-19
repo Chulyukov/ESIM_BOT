@@ -6,11 +6,13 @@ annotated-types==0.7.0
 attrs==23.2.0
 Babel==2.15.0
 certifi==2024.7.4
+charset-normalizer==3.3.2
 fluent-compiler==0.3
 fluent.syntax==0.19.0
 fluentogram==1.1.7
 frozenlist==1.4.1
 idna==3.7
+loguru==0.7.2
 magic-filter==1.0.12
 multidict==6.0.5
 mysql-connector-python==8.4.0
@@ -18,9 +20,9 @@ ordered-set==4.1.0
 pydantic==2.8.2
 pydantic_core==2.20.1
 pytz==2024.1
+requests==2.32.3
 six==1.16.0
 typing_extensions==4.12.2
+urllib3==2.2.2
 watchdog==2.3.1
 yarl==1.9.4
-requests~=2.32.3
-loguru~=0.7.2

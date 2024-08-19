@@ -106,7 +106,10 @@ class BnesimApi:
 
         simcard_details = response["simcard_details"]
         if simcard_details["data_credit_verbose"] != "":
-            country = simcard_details["data_credit_verbose"].split(" ")[3].replace("<br>", "")
+            if simcard_details["data_credit_verbose"].split(" ")[3] == "Russian":
+                country = "Russian Federation"
+            else:
+                country = simcard_details["data_credit_verbose"].split(" ")[3].replace("<br>", "")
 
             first_key = next(iter(simcard_details["data_credit_details"][country]))
             expiration = simcard_details["data_credit_details"][country][first_key]

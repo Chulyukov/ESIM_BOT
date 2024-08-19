@@ -29,7 +29,7 @@ async def choose_payment_method(callback: CallbackQuery):
     buttons = [
         InlineKeyboardButton(text="💳 Российская карта", callback_data=f"choose_plan_rub_{country}"),
         InlineKeyboardButton(text="⭐️ Telegram Stars", callback_data=f"choose_plan_star_{country}"),
-        InlineKeyboardButton(text="⏪ Назад", callback_data="buy_esim")
+        InlineKeyboardButton(text="⏪ К выбору страны", callback_data="buy_esim")
     ]
     kb = build_keyboard(buttons, (1,))
     await callback.message.edit_text("*Выберите способ оплаты.*", reply_markup=kb)
@@ -44,7 +44,7 @@ async def choose_plan_rub(callback: CallbackQuery):
         InlineKeyboardButton(text=f"{gb} ГБ - {price} RUB", callback_data=f"pay_rub_{gb}")
         for gb, price in prices.items()
     ]
-    buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data="buy_esim"))
+    buttons.append(InlineKeyboardButton(text="⏪ К выбору страны", callback_data="buy_esim"))
     kb = build_keyboard(buttons, (2, 2, 1))
     await callback.message.edit_text(text="*Выберите интересующий вас пакет интернета.*", reply_markup=kb)
 
@@ -58,7 +58,7 @@ async def choose_plan_star_card(callback: CallbackQuery):
         InlineKeyboardButton(text=f"{gb} ГБ - {price} STARS", callback_data=f"pay_stars_{gb}")
         for gb, price in prices.items()
     ]
-    buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data="buy_esim"))
+    buttons.append(InlineKeyboardButton(text="⏪ К выбору страны", callback_data="buy_esim"))
     kb = build_keyboard(buttons, (2, 2, 1))
     await callback.message.edit_text(text="*Выберите интересующий вас пакет интернета.*", reply_markup=kb)
 
@@ -104,12 +104,19 @@ async def successful_payment(message: types.Message):
             await Config.BOT.delete_message(chat_id=message.chat.id, message_id=downloading_message.message_id)
             await Config.BOT.send_photo(chat_id=message.chat.id, photo=BufferedInputFile(active_esim[1],
                                                                                          "png_qr_code.png"),
-                                        caption="*🎊 Успешное приобретение вашей первой eSIM!*"
+                                        caption="*🎊 Поздравляем с приобретением вашей первой eSIM!*"
                                                 "\n\n☎️ *Название вашей eSIM:*"
                                                 f" `{data[0].capitalize()} - {active_esim[0][-4:]}`"
-                                                "\n\n*Инструкция по установке:* Telegraph"
-                                                "\n\nТакже вы можете посмотреть подробную информацию о ваших eSIM"
-                                                " с помощью команды /get\_my\_esims")
+                                                "\n\n*📖 Инструкция по установке:*"
+                                                " [Iphone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
+                                                " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"
+                                                " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
+                                                " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
+                                                "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
+                                                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_LINK}"
+                                                "\n\n🤖 Также вы можете посмотреть подробную информацию о ваших eSIM"
+                                                " с помощью команды /get\_my\_esims или перейти в главное меню "
+                                                "/menu")
         elif (top_up_data is not None and len(top_up_data) == 3 and "iccid" in top_up_data
               and top_up_data["iccid"] in [item for item in iccids_list["iccids"]]
               and top_up_flag == 1):
@@ -124,7 +131,7 @@ async def successful_payment(message: types.Message):
                 await message.answer("*🎊 Успешное продление eSIM!*"
                                      f"\n\n*📛 Название вашей eSIM:*"
                                      f" `{top_up_data["country"].capitalize()} - {top_up_data["iccid"][-4:]}`"
-                                     f"\n\nВы можете посмотреть инструкцию по установке и"
+                                     f"\n\n🤖 Вы можете посмотреть инструкцию по установке и"
                                      f" подробную информацию о ваших eSIM с помощью команды /get\_my\_esims")
         else:
             product_id = db_get_product_id(data[0], data[1])
@@ -137,6 +144,14 @@ async def successful_payment(message: types.Message):
                                                                                          "png_qr_code.png"),
                                         caption="🎊 Спасибо за приобретение новой eSIM!"
                                                 "\n\n📛 *Название вашей eSIM:*"
-                                                f" `{data[0].capitalize()} - {active_esim[0][-4:]}` "
-                                                "\n\nВы можете посмотреть инструкцию по установке и"
-                                                " подробную информацию о ваших eSIM с помощью команды /get\_my\_esims")
+                                                f" `{data[0].capitalize()} - {active_esim[0][-4:]}`"
+                                                "\n\n*Инструкция по установке:*"
+                                                " [Iphone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
+                                                " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"
+                                                " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
+                                                " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
+                                                "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
+                                                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_LINK}"
+                                                "\n\n🤖 Также вы можете посмотреть подробную информацию о ваших eSIM"
+                                                " с помощью команды /get\_my\_esims или перейти в главное меню "
+                                                "/menu")

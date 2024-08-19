@@ -66,7 +66,13 @@ async def get_esim_info(callback: CallbackQuery):
         photo=BufferedInputFile(esim_info["qr_code_image"], "png_qr_code.png"),
         caption=f"*📛 Название eSIM:* `{esim_info['country'].capitalize()} - {iccid[-4:]}`"
                 f"\n*🛜 Оставшийся интернет-трафик:* `{esim_info['remaining_data']} GB`"
-                f"*\n\n📖 Инструкция по установке:* *ссылка на Telegraph*"
+                "\n\n*📖 Инструкция по установке:*"
+                " [Iphone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
+                " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"
+                " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
+                " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
+                "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
+                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_LINK}"
                 f"\n\n👇 Также вы можете расширить интернет-пакет данной eSIM, нажав кнопку ниже.",
         reply_markup=kb
     )

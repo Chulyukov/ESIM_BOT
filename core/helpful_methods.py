@@ -31,7 +31,8 @@ async def buy_esim_service(msg):
     message_text = (
         "🚨 *Перед тем, как выбрать страну,"
         " обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
-        "\nВы можете проверить это, следуя шагам из инструкции по ссылке: *ссылка на Telegraph*"
+        f"\nВы можете проверить это, следуя шагам из"
+        f" [инструкции](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27)."
         "\n\n👇*Выберите одну из доступных стран (список стран со временем будет активно пополняться).*"
     )
     if isinstance(msg, CallbackQuery):
@@ -56,7 +57,7 @@ def get_plan_prices(currency, chat_id, is_top_up=False):
 
     # Определяем множитель в зависимости от валюты
     multiplier = (
-        1.047 * Config.EURO_EXCHANGE_RATE if currency == 'RUB'
+        Config.EURO_EXCHANGE_RATE if currency == 'RUB'
         else Config.EURO_EXCHANGE_RATE / 1.3
     )
 
@@ -85,8 +86,10 @@ async def pay_service(callback: CallbackQuery, currency, is_top_up=False):
 
     invoice_params = {
         'chat_id': callback.from_user.id,
-        'title': f"{country.capitalize()} - {gb_amount}GB",
-        'description': f"⚠️ Учтите: активным для оплаты считается счет, выставленный последним в диалоге.",
+        'title': f"Счет “{country.capitalize()} - {gb_amount}GB”",
+        'description': f"Вы выбрали тариф “{country.capitalize()} - {gb_amount}”."
+                       f" Если вы хотите выбрать другой тариф, нажмите соответствующую кнопку в сообщении выше."
+                       " ⚠️ Учтите: активным для оплаты считается счет, выставленный последним в диалоге.",
         'provider_token': Config.YOKASSA_TEST_TOKEN if currency == 'RUB' else '',
         'currency': 'rub' if currency == 'RUB' else 'XTR',
         # 'photo_url': "https://drive.google.com/file/d/1OYhHtsjpDgw40_l2nw47fQnav_oDDMAS/view?usp=sharing",
