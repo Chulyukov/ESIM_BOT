@@ -1,12 +1,13 @@
 import asyncio
 
+from aiogram.types import ReactionTypeCustomEmoji
 from loguru import logger
 
 from bnesim_api import BnesimApi
 from config import Config
 from db.db_bnesim_products import db_get_bnesim_products
 
-logger.add('../logs/update_bnesim_products.log', level='DEBUG', format='{time} | {level} | {name} | {message}')
+logger.add('logs/update_bnesim_products.log', level='DEBUG', format='{time} | {level} | {name} | {message}')
 
 
 async def update_products():

@@ -72,7 +72,7 @@ async def get_esim_info(callback: CallbackQuery):
                 " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
                 " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
                 "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
-                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_LINK}"
+                f" обратитесь в службу заботы клиента eSIM Unity {Config.SUPPORT_SIMPLE_LINK}"
                 f"\n\n👇 Также вы можете расширить интернет-пакет данной eSIM, нажав кнопку ниже.",
         reply_markup=kb
     )

@@ -113,7 +113,7 @@ async def successful_payment(message: types.Message):
                                                 " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
                                                 " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
                                                 "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
-                                                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_LINK}"
+                                                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_SIMPLE_LINK}"
                                                 "\n\n🤖 Также вы можете посмотреть подробную информацию о ваших eSIM"
                                                 " с помощью команды /get\_my\_esims или перейти в главное меню "
                                                 "/menu")
@@ -151,7 +151,7 @@ async def successful_payment(message: types.Message):
                                                 " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
                                                 " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
                                                 "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
-                                                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_LINK}"
+                                                f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_SIMPLE_LINK}"
                                                 "\n\n🤖 Также вы можете посмотреть подробную информацию о ваших eSIM"
                                                 " с помощью команды /get\_my\_esims или перейти в главное меню "
                                                 "/menu")

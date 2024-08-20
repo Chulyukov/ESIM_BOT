@@ -19,7 +19,7 @@ class Config:
     BNESIM_PARTNER_LOGIN = "nikita.admin"
     BNESIM_API_KEY = "pe2mp9qxcen9"
     # БД
-    DB_HOST = "localhost"
+    DB_HOST = "94.131.115.240"
     DB_NAME = "esim_db"
     DB_USER = "root"
     DB_PASS = "kexibq528123"
@@ -27,6 +27,7 @@ class Config:
     QUESTIONS_LINK = "https://telegra.ph/CHto-takoe-eSIM-07-27"
     # Ссылка на саппорта
     SUPPORT_LINK = "https://t.me/esim_unity_support"
+    SUPPORT_SIMPLE_LINK = "@esim\_unity\_support"
     # Ссылка на канал
     CHANNEL_LINK = "https://t.me/esim_unity"
     # YOKASSA TOKEN

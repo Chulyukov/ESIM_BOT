@@ -11,7 +11,7 @@ from db.users.db_users_cli import db_get_all_cli
 bnesim_api = BnesimApi()
 result = db_get_all_cli()
 
-logger.add('../logs/check_remaining_traffic.log', level='DEBUG', format='{time} | {level} | {name} | {message}')
+logger.add('logs/check_remaining_traffic.log', level='DEBUG', format='{time} | {level} | {name} | {message}')
 
 
 async def send_remaining_info():
