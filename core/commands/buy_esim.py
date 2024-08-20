@@ -44,7 +44,7 @@ async def choose_plan_rub(callback: CallbackQuery):
         InlineKeyboardButton(text=f"{gb} ГБ - {price} RUB", callback_data=f"pay_rub_{gb}")
         for gb, price in prices.items()
     ]
-    buttons.append(InlineKeyboardButton(text="⏪ К выбору страны", callback_data="buy_esim"))
+    buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data=f"choose_payment_method_{country}"))
     kb = build_keyboard(buttons, (2, 2, 1))
     await callback.message.edit_text(text="*Выберите интересующий вас пакет интернета.*", reply_markup=kb)
 
@@ -58,7 +58,7 @@ async def choose_plan_star_card(callback: CallbackQuery):
         InlineKeyboardButton(text=f"{gb} ГБ - {price} STARS", callback_data=f"pay_stars_{gb}")
         for gb, price in prices.items()
     ]
-    buttons.append(InlineKeyboardButton(text="⏪ К выбору страны", callback_data="buy_esim"))
+    buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data=f"choose_payment_method_{country}"))
     kb = build_keyboard(buttons, (2, 2, 1))
     await callback.message.edit_text(text="*Выберите интересующий вас пакет интернета.*", reply_markup=kb)
 
