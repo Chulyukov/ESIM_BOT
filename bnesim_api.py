@@ -37,13 +37,13 @@ class BnesimApi:
 
     def get_products_catalog(self):
         product_list = self._get("/partners_pricing/?format=json&a=928G")
-        pattern = r'^Surf (3|5|10|20)+GB in [A-Za-z0-9 ]+ for 30 days$'
+        pattern = r'^Surf (3|5|10|20)+GB in [A-Za-z0-9 ]+ (for|per) 30 days$'
         new_data = {}
         for product in product_list:
             product_name = product.get("product_name")
             if product_name and re.match(pattern, product_name) and \
                     any(product_name.split(" ")[3].lower() == country for country in
-                        ["egypt", "turkey", "thailand", "georgia", "italy"]):
+                        ["egypt", "turkey", "thailand", "georgia", "italy", "europe"]):
                 country = product_name.split(" ")[3].lower()
                 volume = int(product_name.split(" ")[1].replace("GB", ""))
                 price = str(product["price"])

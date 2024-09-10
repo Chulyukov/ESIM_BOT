@@ -46,7 +46,11 @@ async def choose_plan_rub(callback: CallbackQuery):
     ]
     buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data=f"choose_payment_method_{country}"))
     kb = build_keyboard(buttons, (2, 2, 1))
-    await callback.message.edit_text(text="*Выберите интересующий вас пакет интернета.*", reply_markup=kb)
+    await callback.message.edit_text(text="💳 Оплачивая российской картой, вы соглашаетесь с"
+                                          " [условиями использования сервиса](https://telegra.ph/Kak-proishodit-oplata-v-bote-09-05)."
+                                          "\n\n*Выберите интересующий вас пакет интернета.*",
+                                     reply_markup=kb,
+                                     disable_web_page_preview=True)
 
 
 @router.callback_query(F.data.startswith("choose_plan_star_"))

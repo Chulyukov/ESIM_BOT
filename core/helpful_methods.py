@@ -26,9 +26,10 @@ async def buy_esim_service(msg):
         InlineKeyboardButton(text="🇹🇭Тайланд", callback_data="choose_payment_method_thailand"),
         InlineKeyboardButton(text="🇬🇪Грузия", callback_data="choose_payment_method_georgia"),
         InlineKeyboardButton(text="🇪🇬Египет", callback_data="choose_payment_method_egypt"),
-        InlineKeyboardButton(text="🇪🇬Италия", callback_data="choose_payment_method_italy"),
+        InlineKeyboardButton(text="🇮🇹Италия", callback_data="choose_payment_method_italy"),
+        InlineKeyboardButton(text="🇪🇺Европа", callback_data="choose_payment_method_europe"),
     ]
-    kb = build_keyboard(buttons, (2, 2, 1))
+    kb = build_keyboard(buttons, (2,))
 
     message_text = (
         "🚨 *Перед тем, как выбрать страну,"
@@ -94,7 +95,7 @@ async def pay_service(callback: CallbackQuery, currency, is_top_up=False):
                        " ⚠️ Учтите: активным для оплаты считается счет, выставленный последним в диалоге.",
         'provider_token': Config.YOKASSA_TEST_TOKEN if currency == 'RUB' else '',
         'currency': 'rub' if currency == 'RUB' else 'XTR',
-        'photo_url': photo_url,
+        'photo_url': photo_url if photo_url else '',
         'photo_width': 485,
         'photo_height': 300,
         'is_flexible': False,
