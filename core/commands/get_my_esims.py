@@ -101,7 +101,11 @@ async def top_up_choose_plan_russian(callback: CallbackQuery):
         InlineKeyboardButton(text="⏪ Назад", callback_data="top_up_choose_payment_method_back")
     ).adjust(2, 2, 1).as_markup())
 
-    await callback.message.edit_text(text="*👇 Выберите интересующий вас пакет интернета.*", reply_markup=kb)
+    await callback.message.edit_text(text="💳 Оплачивая российской картой, вы соглашаетесь с"
+                                          " [условиями использования сервиса](https://telegra.ph/Kak-proishodit-oplata-v-bote-09-05)."
+                                          "\n\n*Выберите интересующий вас пакет интернета.*",
+                                     reply_markup=kb,
+                                     disable_web_page_preview=True)
 
 
 @router.callback_query(F.data == "top_up_choose_plan_star")
