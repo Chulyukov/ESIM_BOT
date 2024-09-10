@@ -27,11 +27,11 @@ async def get_my_esims(message: Message):
 
     if iccids_map["length"] == 0:
         kb = InlineKeyboardBuilder().add(
-            InlineKeyboardButton(text="Приобрести esim", callback_data="buy_esim")
+            InlineKeyboardButton(text="Приобрести eSIM", callback_data="buy_esim")
         ).as_markup()
         await Config.BOT.delete_message(chat_id=message.chat.id, message_id=downloading_message.message_id)
         await message.answer(
-            text="*💔 Мы не нашли у вас ни одной esim, но вы можете приобрести их, нажав кнопку ниже.*",
+            text="*💔 Мы не нашли у вас ни одной eSIM, но вы можете приобрести их, нажав кнопку ниже.*",
             reply_markup=kb
         )
     else:
@@ -67,10 +67,11 @@ async def get_esim_info(callback: CallbackQuery):
         caption=f"*📛 Название eSIM:* `{esim_info['country'].capitalize()} - {iccid[-4:]}`"
                 f"\n*🛜 Оставшийся интернет-трафик:* `{esim_info['remaining_data']} GB`"
                 "\n\n*📖 Инструкция по установке:*"
-                " [Iphone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
+                " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
                 " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"
                 " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
                 " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
+                " | [Google Pixel](https://telegra.ph/Kak-podklyuchit-eSIM-na-Pixel-08-24)"
                 "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
                 f" обратитесь в службу заботы клиента eSIM Unity {Config.SUPPORT_SIMPLE_LINK}"
                 f"\n\n👇 Также вы можете расширить интернет-пакет данной eSIM, нажав кнопку ниже.",

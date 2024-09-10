@@ -1,5 +1,4 @@
 import mysql.connector
-from loguru import logger
 
 from config import Config
 
@@ -15,7 +14,7 @@ def get_database_connection():
         )
         return connection
     except mysql.connector.Error as err:
-        logger.error("Проблема с подключением к БД: ", err)
+        print("Проблема с подключением к БД: ", err)
 
 
 def execute_query(err_msg, query, params=None):

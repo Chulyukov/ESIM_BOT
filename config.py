@@ -12,6 +12,8 @@ class Config:
     TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
     BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    # Токен YOKASSA
+    YOKASSA_TOKEN = ""
     # Тестовый токен YOKASSA
     YOKASSA_TEST_TOKEN = "381764678:TEST:91407"
     # BNESIM креды
@@ -20,8 +22,8 @@ class Config:
     # БД
     DB_HOST = "94.131.115.240"
     DB_NAME = "esim_db"
-    DB_USER = "root"
-    DB_PASS = "kexibq528123"
+    DB_USER = "esim_user"
+    DB_PASS = "Kexibq528123!"
     # Ссылка на популярные вопросы в Telegraph
     QUESTIONS_LINK = "https://telegra.ph/CHto-takoe-eSIM-07-27"
     # Ссылка на саппорта
@@ -32,4 +34,4 @@ class Config:
     # YOKASSA TOKEN
     YUKASSA_LIVE_TOKEN = "390540012:LIVE:36227"
     # Курс евро
-    EURO_EXCHANGE_RATE = 99
+    EURO_EXCHANGE_RATE = 102

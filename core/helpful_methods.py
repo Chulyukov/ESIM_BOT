@@ -1,10 +1,11 @@
 import json
 
 from aiogram import types
-from aiogram.types import CallbackQuery, InlineKeyboardButton
+from aiogram.types import CallbackQuery, InlineKeyboardButton, InputFile, FSInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import Config
+from db.countries.db_countries_pay_pic_link import db_get_pay_pic_link
 from db.db_bnesim_products import db_get_price_data
 from db.users.db_users_data import db_get_data_country, db_update_data_volume
 from db.users.db_users_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
@@ -83,18 +84,18 @@ async def pay_service(callback: CallbackQuery, currency, is_top_up=False):
         db_update_data_volume(callback.message.chat.id, gb_amount)
     prices = get_plan_prices(currency, callback.message.chat.id, is_top_up)
     amount = prices[gb_amount]
+    photo_url = db_get_pay_pic_link(country)
 
     invoice_params = {
         'chat_id': callback.from_user.id,
         'title': f"Счет “{country.capitalize()} - {gb_amount}GB”",
         'description': f"Вы выбрали тариф “{country.capitalize()} - {gb_amount}”."
-                       f" Если вы хотите выбрать другой тариф, нажмите соответствующую кнопку в сообщении выше."
                        " ⚠️ Учтите: активным для оплаты считается счет, выставленный последним в диалоге.",
         'provider_token': Config.YOKASSA_TEST_TOKEN if currency == 'RUB' else '',
         'currency': 'rub' if currency == 'RUB' else 'XTR',
-        # 'photo_url': "https://drive.google.com/file/d/1OYhHtsjpDgw40_l2nw47fQnav_oDDMAS/view?usp=sharing",
-        # 'photo_width': 416,
-        # 'photo_height': 416,
+        'photo_url': photo_url,
+        'photo_width': 485,
+        'photo_height': 300,
         'is_flexible': False,
         'prices': [types.LabeledPrice(label=f"eSIM payment using {currency}",
                                       amount=amount * 100 if currency == 'RUB' else amount)],
