@@ -1,7 +1,7 @@
 import json
 
 from aiogram import types
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InputFile, FSInputFile
+from aiogram.types import CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import Config
@@ -25,9 +25,10 @@ async def buy_esim_service(msg):
         InlineKeyboardButton(text="🇹🇷Турция", callback_data="choose_payment_method_turkey"),
         InlineKeyboardButton(text="🇹🇭Тайланд", callback_data="choose_payment_method_thailand"),
         InlineKeyboardButton(text="🇬🇪Грузия", callback_data="choose_payment_method_georgia"),
-        InlineKeyboardButton(text="🇪🇬Египет", callback_data="choose_payment_method_egypt")
+        InlineKeyboardButton(text="🇪🇬Египет", callback_data="choose_payment_method_egypt"),
+        InlineKeyboardButton(text="🇪🇬Италия", callback_data="choose_payment_method_italy"),
     ]
-    kb = build_keyboard(buttons, (2,))
+    kb = build_keyboard(buttons, (2, 2, 1))
 
     message_text = (
         "🚨 *Перед тем, как выбрать страну,"
