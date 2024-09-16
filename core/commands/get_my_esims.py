@@ -8,8 +8,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bnesim_api import BnesimApi
 from config import Config
 from core.helpful_methods import get_plan_prices, pay_service
-from db.users.db_users_cli import db_get_cli
-from db.users.db_users_top_up_data import db_update_top_up_data_iccid_and_country
+from db.users.db_cli import db_get_cli
+from db.users.db_top_up_data import db_update_top_up_data_iccid_and_country
 
 router = Router()
 

@@ -7,11 +7,11 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, Buffered
 
 from bnesim_api import BnesimApi
 from config import Config
-from core.helpful_methods import get_username, get_plan_prices, build_keyboard, pay_service, buy_esim_service
+from core.helpful_methods import get_username, get_plan_prices, build_keyboard, pay_service, choose_country
 from db.db_bnesim_products import db_get_product_id
-from db.users.db_users_cli import db_get_cli, db_update_cli
-from db.users.db_users_data import db_update_data_country, db_get_all_data, db_clean_data
-from db.users.db_users_top_up_data import db_get_all_top_up_data, db_clean_top_up_data, db_get_top_up_flag
+from db.users.db_cli import db_get_cli, db_update_cli
+from db.users.db_data import db_update_data_country, db_get_all_data, db_clean_data
+from db.users.db_top_up_data import db_get_all_top_up_data, db_clean_top_up_data, db_get_top_up_flag
 
 router = Router()
 
@@ -19,7 +19,7 @@ router = Router()
 @router.callback_query(F.data == "buy_esim")
 @router.message(Command("buy_esim"))
 async def buy_esim(message: Message | CallbackQuery):
-    await buy_esim_service(message)
+    await choose_country(message)
 
 
 @router.callback_query(F.data.startswith("choose_payment_method_"))

@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bnesim_api import BnesimApi
 from config import Config
-from db.users.db_users_cli import db_get_all_cli
+from db.users.db_cli import db_get_all_cli
 
 bnesim_api = BnesimApi()
 users_list = db_get_all_cli()
