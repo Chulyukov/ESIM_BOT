@@ -1,31 +1,114 @@
+import decimal
 import hashlib
+from urllib import parse
+from urllib.parse import urlparse
 
-from aiogram import Router
 from aiohttp import web
 
 from config import Config
 from db.users.db_payments import db_update_payment_status, db_get_chat_id_by_invoice_id
 
+
 bot = Config.BOT
-router = Router()
 
 
+def calculate_signature(*args) -> str:
+    """Create signature MD5.
+    """
+    return hashlib.md5(':'.join(str(arg) for arg in args).encode()).hexdigest()
+
+
+def parse_response(request: str) -> dict:
+    """
+    :param request: Link.
+    :return: Dictionary.
+    """
+    params = {}
+
+    for item in urlparse(request).query.split('&'):
+        key, value = item.split('=')
+        params[key] = value
+    return params
+
+
+def check_signature_result(
+        order_number: int,  # invoice number
+        received_sum: decimal,  # cost of goods, RU
+        received_signature: hex,  # SignatureValue
+        password: str  # Merchant password
+) -> bool:
+    signature = calculate_signature(received_sum, order_number, password)
+    if signature.lower() == received_signature.lower():
+        return True
+    return False
+
+
+# Формирование URL переадресации пользователя на оплату.
+
+def generate_payment_link(
+        merchant_login: str,  # Merchant login
+        merchant_password_1: str,  # Merchant password
+        cost: decimal,  # Cost of goods, RU
+        number: int,  # Invoice number
+        description: str,  # Description of the purchase
+        is_test=0,
+        robokassa_payment_url='https://auth.robokassa.ru/Merchant/Index.aspx',
+) -> str:
+    """URL for redirection of the customer to the service.
+    """
+    signature = calculate_signature(
+        merchant_login,
+        cost,
+        number,
+        merchant_password_1
+    )
+
+    data = {
+        'MerchantLogin': merchant_login,
+        'OutSum': cost,
+        'InvId': number,
+        'Description': description,
+        'SignatureValue': signature,
+        'IsTest': is_test
+    }
+    return f'{robokassa_payment_url}?{parse.urlencode(data)}'
+
+
+# Получение уведомления об исполнении операции (ResultURL).
 async def handle_result(request):
     data = await request.post()
+    print("data: ", data)
     out_summ = data.get('OutSum')
+    print("out_sum: ", out_summ)
     invoice_id = data.get('InvId')
+    print("invoice_id: ", invoice_id)
+
     signature = data.get('SignatureValue')
 
     expected_signature = hashlib.md5(f"{out_summ}:{invoice_id}:{Config.TEST_PASSWORD2}".encode()).hexdigest()
 
     if signature.lower() == expected_signature.lower():
-        # Платеж успешно обработан
         db_update_payment_status(invoice_id, 'paid')
-
         chat_id = db_get_chat_id_by_invoice_id(invoice_id)
-        print(chat_id)
+        # print(chat_id)
         if chat_id:
             await bot.send_message(chat_id, 'Ваш платеж успешно обработан!')
         return web.Response(text=f'OK{invoice_id}')
     else:
         return web.Response(text='bad sign')
+
+
+# Проверка параметров в скрипте завершения операции (SuccessURL).
+
+def check_success_payment(merchant_password_1: str, request: str) -> str:
+    """ Verification of operation parameters ("cashier check") in SuccessURL script.
+    :param request: HTTP parameters
+    """
+    param_request = parse_response(request)
+    cost = param_request['OutSum']
+    number = param_request['InvId']
+    signature = param_request['SignatureValue']
+
+    if check_signature_result(number, cost, signature, merchant_password_1):
+        return "Thank you for using our service"
+    return "bad sign"

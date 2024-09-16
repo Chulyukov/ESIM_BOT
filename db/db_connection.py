@@ -28,7 +28,7 @@ def execute_query(err_msg, query, params=None):
         result = cursor.fetchall()
         return result
     except mysql.connector.Error as err:
-        logger.error(err_msg, ':', err)
+        print(err_msg, ':', err)
         return None
     finally:
         connection.commit()

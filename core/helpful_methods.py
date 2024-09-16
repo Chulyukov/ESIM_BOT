@@ -12,7 +12,7 @@ from db.users.db_data import db_get_data_country, db_update_data_volume
 from db.users.db_payments import db_save_invoice_user
 from db.users.db_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
     db_update_top_up_flag_true, db_update_top_up_flag_false
-from robokassa_default_api import generate_payment_link
+from robokassa_api import generate_payment_link
 
 
 def get_username(message):

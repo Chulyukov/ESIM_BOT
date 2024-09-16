@@ -18,10 +18,10 @@ class Config:
     BNESIM_PARTNER_LOGIN = "nikita.admin"
     BNESIM_API_KEY = "pe2mp9qxcen9"
     # БД
-    DB_HOST = "localhost"
+    DB_HOST = "94.131.115.240"
     DB_NAME = "esim_db"
-    DB_USER = "root"
-    DB_PASS = "kexibq528123"
+    DB_USER = "esim_user"
+    DB_PASS = "Kexibq528123!"
     # Ссылка на популярные вопросы в Telegraph
     QUESTIONS_LINK = "https://telegra.ph/CHto-takoe-eSIM-07-27"
     # Ссылка на саппорта
