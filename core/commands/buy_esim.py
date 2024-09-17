@@ -5,7 +5,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton
 
 from bnesim_api import BnesimApi
 from config import Config
-from core.helpful_methods import get_username, get_plan_prices, build_keyboard, pay_service, choose_country, \
+from helpful_methods import get_username, get_plan_prices, build_keyboard, pay_service, choose_country, \
     add_new_user_after_payment, add_new_esim_after_payment, prolong_esim_after_payment
 from db.users.db_cli import db_get_cli
 from db.users.db_data import db_update_data_country, db_get_all_data

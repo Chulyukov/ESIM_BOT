@@ -6,14 +6,11 @@ from aiohttp import web
 
 from bnesim_api import BnesimApi
 from config import Config
-from core.helpful_methods import add_new_user_after_payment, add_new_esim_after_payment, \
-    prolong_esim_after_payment
+from helpful_methods import add_new_user_after_payment, prolong_esim_after_payment, add_new_esim_after_payment
 from db.users.db_cli import db_get_cli
 from db.users.db_data import db_get_all_data
 from db.users.db_payments import db_update_payment_status, db_get_chat_id_by_invoice_id, db_get_username_by_invoice_id
 from db.users.db_top_up_data import db_get_all_top_up_data, db_get_top_up_flag
-
-bot = Config.BOT
 
 
 def calculate_signature(*args) -> str:
@@ -57,17 +54,16 @@ async def handle_result(request):
 
     chat_id = db_get_chat_id_by_invoice_id(invoice_id)
     if signature.lower() == expected_signature.lower():
-        db_update_payment_status(invoice_id, 'paid')
-
         if out_summ in {111, 222, 333, 444}:
-            await bot.send_message("🤗 Благодарим вас за поддержку нашего продукта!"
-                                   "\n💪 Мы ежедневно прилагаем усилия, чтобы сделать его еще лучше.")
+            await Config.BOT.send_message("🤗 Благодарим вас за поддержку нашего продукта!"
+                                          "\n💪 Мы ежедневно прилагаем усилия, чтобы сделать его еще лучше.")
         else:
             bnesim = BnesimApi()
             cli = db_get_cli(chat_id)
             data = db_get_all_data(chat_id)
             top_up_data = db_get_all_top_up_data(chat_id)
-            downloading_message = await bot.send_message("*🚀 Подождите, обрабатываю данные платежа...*")
+            downloading_message = await Config.BOT.send_message(chat_id=chat_id,
+                                                                text="*🚀 Подождите, обрабатываю данные платежа...*")
             iccids_list = bnesim.get_iccids_of_user(cli)
             top_up_flag = db_get_top_up_flag(chat_id)
             username = db_get_username_by_invoice_id(invoice_id)
@@ -81,10 +77,11 @@ async def handle_result(request):
                 await prolong_esim_after_payment(chat_id, top_up_data, cli, bnesim, downloading_message)
             else:
                 await add_new_esim_after_payment(chat_id, data, cli, bnesim, downloading_message)
+        db_update_payment_status(invoice_id, 'paid')
         return web.Response(text=f'OK{invoice_id}')
     else:
-        await bot.send_message(chat_id, 'произошла ошибка при обработке платежа! '
-                                        'Деньги не были списаны, попробуйте заново.')
+        await Config.BOT.send_message(chat_id, 'произошла ошибка при обработке платежа! '
+                                               'Деньги не были списаны, попробуйте заново.')
         db_update_payment_status(invoice_id, 'failed')
-        await bot.send_message(chat_id=chat_id, text="Ваш платеж не прошел. Пожалуйста, попробуйте снова.")
+        await Config.BOT.send_message(chat_id=chat_id, text="Ваш платеж не прошел. Пожалуйста, попробуйте снова.")
         return web.Response(text='bad sign')

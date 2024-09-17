@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from core.helpful_methods import choose_country, get_username
+from helpful_methods import choose_country, get_username
 from db.db_start import db_check_user_exist, db_add_user
 
 router = Router()
