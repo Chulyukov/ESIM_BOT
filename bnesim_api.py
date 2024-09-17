@@ -1,5 +1,6 @@
 import re
 from io import BytesIO
+from pprint import pprint
 
 import requests
 
@@ -103,19 +104,17 @@ class BnesimApi:
 
         simcard_details = response["simcard_details"]
         if simcard_details["data_credit_verbose"] != "":
-            if simcard_details["data_credit_verbose"].split(" ")[3] == "Russian":
-                country = "Russian Federation"
-            else:
-                country = simcard_details["data_credit_verbose"].split(" ")[3].replace("<br>", "")
+            country = simcard_details["data_credit_verbose"].split(" ")[3].replace("<br>", "")
 
-            first_key = next(iter(simcard_details["data_credit_details"][country]))
-            expiration = simcard_details["data_credit_details"][country][first_key]
+            first_level_key = next(iter(simcard_details["data_credit_details"]))
+            second_level_key = next(iter(simcard_details["data_credit_details"][first_level_key]))
+            details = simcard_details["data_credit_details"][first_level_key][second_level_key]
 
             result = {
-                "volume": round(expiration["associated_product"]["volume"] / 1024, 2),
-                "name": f"{round(expiration['associated_product']['volume'] / 1024, 2)}GB - {country}",
+                "volume": round(details["associated_product"]["volume"] / 1024, 2),
+                "name": f"{round(details['associated_product']['volume'] / 1024, 2)}GB - {country}",
                 "country": country,
-                "remaining_data": round(expiration["remaining_mb"] / 1024, 2),
+                "remaining_data": round(details["remaining_mb"] / 1024, 2),
                 "qr_code_image": BytesIO(requests.get(simcard_details["qr_code_image"]).content).read()
             }
 

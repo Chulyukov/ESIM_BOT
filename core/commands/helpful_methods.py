@@ -41,7 +41,7 @@ async def choose_country(msg: Message | CallbackQuery):
         "\n\n👇*Выберите одну из доступных стран (список стран со временем будет активно пополняться).*"
     )
     if isinstance(msg, CallbackQuery):
-        await msg.message.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
+        await msg.message.edit_text(text=message_text, reply_markup=kb, disable_web_page_preview=True)
     else:
         await msg.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
 
@@ -111,12 +111,15 @@ async def pay_service(callback: CallbackQuery, currency, is_top_up=False):
         digits = random.randint(3, 10)
         invoice_id = random.randint(10 ** (digits - 1), (10 ** digits) - 1)
         db_save_invoice_user(invoice_id, chat_id, get_username(callback.message))
-        payment_link = generate_payment_link(Config.MERCHANT_LOGIN, Config.TEST_PASSWORD1, amount, invoice_id,
-                                             f"{country} - {amount}", 1)
+        payment_link = generate_payment_link(Config.MERCHANT_LOGIN, Config.PASSWORD1, amount, invoice_id,
+                                             f"{country} - {amount}", 0)
         kb = InlineKeyboardBuilder().add(
             InlineKeyboardButton(text="Оплатить", url=payment_link)
         ).as_markup()
-        await Config.BOT.send_photo(chat_id=chat_id,
-                                    photo=photo_url,
-                                    caption="Нажмите кнопку ниже для оплаты:",
-                                    reply_markup=kb)
+        if photo_url:
+            await Config.BOT.send_photo(chat_id=chat_id,
+                                        photo=photo_url,
+                                        caption="Нажмите кнопку ниже для оплаты:",
+                                        reply_markup=kb)
+        else:
+            await Config.BOT.send_message(chat_id=chat_id, text="Нажмите кнопку ниже для оплаты:", reply_markup=kb)

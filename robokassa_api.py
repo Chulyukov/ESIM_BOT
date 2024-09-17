@@ -52,12 +52,12 @@ async def handle_result(request):
     invoice_id = data.get('InvId')
     signature = data.get('SignatureValue')
 
-    expected_signature = hashlib.md5(f"{out_summ}:{invoice_id}:{Config.TEST_PASSWORD2}".encode()).hexdigest()
+    expected_signature = hashlib.md5(f"{out_summ}:{invoice_id}:{Config.PASSWORD2}".encode()).hexdigest()
 
     chat_id = db_get_chat_id_by_invoice_id(invoice_id)
     if signature.lower() == expected_signature.lower():
         if out_summ in {111, 222, 333, 444}:
-            await Config.BOT.send_message("🤗 Благодарим вас за поддержку нашего продукта!"
+            await Config.BOT.send_message(chat_id=chat_id, text="🤗 Благодарим вас за поддержку нашего продукта!"
                                           "\n💪 Мы ежедневно прилагаем усилия, чтобы сделать его еще лучше.")
         else:
             bnesim = BnesimApi()
@@ -106,7 +106,7 @@ async def handle_result(request):
                     while api_answer is None:
                         await asyncio.sleep(1)
                     await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
-                    await Config.BOT.send_message("*🎊 Успешное продление eSIM!*"
+                    await Config.BOT.send_message(chat_id=chat_id, text="*🎊 Успешное продление eSIM!*"
                                                   f"\n\n*📛 Название вашей eSIM:*"
                                                   f" `{top_up_data["country"].capitalize()} - {top_up_data["iccid"][-4:]}`"
                                                   f"\n\n🤖 Вы можете посмотреть инструкцию по установке и"
@@ -137,8 +137,6 @@ async def handle_result(request):
         db_update_payment_status(invoice_id, 'paid')
         return web.Response(text=f'OK{invoice_id}')
     else:
-        await Config.BOT.send_message(chat_id, 'произошла ошибка при обработке платежа! '
-                                               'Деньги не были списаны, попробуйте заново.')
-        db_update_payment_status(invoice_id, 'failed')
         await Config.BOT.send_message(chat_id=chat_id, text="Ваш платеж не прошел. Пожалуйста, попробуйте снова.")
+        db_update_payment_status(invoice_id, 'failed')
         return web.Response(text='bad sign')
