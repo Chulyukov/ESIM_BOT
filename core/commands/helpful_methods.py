@@ -114,12 +114,18 @@ async def pay_service(callback: CallbackQuery, currency, is_top_up=False):
         payment_link = generate_payment_link(Config.MERCHANT_LOGIN, Config.PASSWORD1, amount, invoice_id,
                                              f"{country} - {amount}", 0)
         kb = InlineKeyboardBuilder().add(
-            InlineKeyboardButton(text="Оплатить", url=payment_link)
+            InlineKeyboardButton(text="💳 Оплатить", url=payment_link)
         ).as_markup()
         if photo_url:
             await Config.BOT.send_photo(chat_id=chat_id,
                                         photo=photo_url,
-                                        caption="Нажмите кнопку ниже для оплаты:",
+                                        caption=f"Вы выбрали тариф"
+                                                f" “{country.capitalize()} - {gb_amount}”."
+                                                f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
+                                                f" выставленный последним в диалоге.",
                                         reply_markup=kb)
         else:
-            await Config.BOT.send_message(chat_id=chat_id, text="Нажмите кнопку ниже для оплаты:", reply_markup=kb)
+            await Config.BOT.send_message(chat_id=chat_id, text=f"Вы выбрали тариф"
+                                                                f" “{country.capitalize()} - {gb_amount}”."
+                                                                f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
+                                                                f" выставленный последним в диалоге.", reply_markup=kb)

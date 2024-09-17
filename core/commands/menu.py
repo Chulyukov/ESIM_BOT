@@ -19,6 +19,5 @@ async def menu(message: Message):
     await message.answer(text="*Основные действия бота*"
                               "\n📖 /menu - главное меню"
                               "\n🌐 /buy\_esim - приобрести eSIM"
-                              "\n🤝 /get\_my\_esims - посмотреть мои eSIM"
-                              "\n🎗️ /donate - поддержать проект",
+                              "\n🤝 /get\_my\_esims - посмотреть мои eSIM",
                          reply_markup=kb)
