@@ -18,8 +18,8 @@ router = Router()
 
 @router.callback_query(F.data == "buy_esim")
 @router.message(Command("buy_esim"))
-async def buy_esim(message: Message | CallbackQuery):
-    await choose_country(message)
+async def buy_esim(msg: Message | CallbackQuery):
+    await choose_country(msg)
 
 
 @router.callback_query(F.data.startswith("choose_payment_method_"))

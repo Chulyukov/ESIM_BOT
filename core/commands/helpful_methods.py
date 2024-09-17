@@ -1,7 +1,7 @@
 import random
 
 from aiogram import types
-from aiogram.types import CallbackQuery, InlineKeyboardButton
+from aiogram.types import CallbackQuery, InlineKeyboardButton, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import Config
@@ -22,7 +22,7 @@ def get_username(message):
     return username
 
 
-async def choose_country(message):
+async def choose_country(msg: Message | CallbackQuery):
     buttons = [
         InlineKeyboardButton(text="🇹🇷Турция", callback_data="choose_payment_method_turkey"),
         InlineKeyboardButton(text="🇹🇭Тайланд", callback_data="choose_payment_method_thailand"),
@@ -36,12 +36,14 @@ async def choose_country(message):
     message_text = (
         "🚨 *Перед тем, как выбрать страну,"
         " обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
-        f"\nВы можете проверить это, следуя шагам из"
-        f" [инструкции](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27)."
+        "\nВы можете проверить это, следуя шагам из"
+        " [инструкции](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27)."
         "\n\n👇*Выберите одну из доступных стран (список стран со временем будет активно пополняться).*"
     )
-
-    await message.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
+    if isinstance(msg, CallbackQuery):
+        await msg.message.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
+    else:
+        await msg.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
 
 
 def build_keyboard(buttons, adjust_params):
