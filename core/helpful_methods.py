@@ -1,4 +1,4 @@
-import json
+import asyncio
 import random
 
 from aiogram import types
@@ -7,11 +7,12 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import Config
 from db.countries.db_pay_pic_link import db_get_pay_pic_link
-from db.db_bnesim_products import db_get_price_data
-from db.users.db_data import db_get_data_country, db_update_data_volume
+from db.db_bnesim_products import db_get_price_data, db_get_product_id
+from db.users.db_cli import db_update_cli
+from db.users.db_data import db_get_data_country, db_update_data_volume, db_clean_data
 from db.users.db_payments import db_save_invoice_user
 from db.users.db_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
-    db_update_top_up_flag_true, db_update_top_up_flag_false
+    db_update_top_up_flag_true, db_update_top_up_flag_false, db_clean_top_up_data
 from robokassa_api import generate_payment_link
 
 
@@ -109,7 +110,7 @@ async def pay_service(callback: CallbackQuery, currency, is_top_up=False):
     else:
         digits = random.randint(3, 10)
         invoice_id = random.randint(10 ** (digits - 1), (10 ** digits) - 1)
-        db_save_invoice_user(invoice_id, chat_id)
+        db_save_invoice_user(invoice_id, chat_id, get_username(callback.message))
         payment_link = generate_payment_link(Config.MERCHANT_LOGIN, Config.TEST_PASSWORD1, amount, invoice_id,
                                              f"{country} - {amount}", 1)
         kb = InlineKeyboardBuilder().add(
@@ -119,3 +120,70 @@ async def pay_service(callback: CallbackQuery, currency, is_top_up=False):
                                     photo=photo_url,
                                     caption="Нажмите кнопку ниже для оплаты:",
                                     reply_markup=kb)
+
+
+async def add_new_user_after_payment(chat_id, data, cli, bnesim, downloading_message):
+    product_id = db_get_product_id(data[0], data[1])
+    db_update_cli(chat_id, cli)
+    active_esim = bnesim.activate_esim(cli, product_id)
+    while cli is None and active_esim[1] is None:
+        await asyncio.sleep(1)
+    db_clean_data(chat_id)
+    await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
+    await Config.BOT.send_photo(chat_id=chat_id, photo=BufferedInputFile(active_esim[1],
+                                                                         "png_qr_code.png"),
+                                caption="*🎊 Поздравляем с приобретением вашей первой eSIM!*"
+                                        "\n\n☎️ *Название вашей eSIM:*"
+                                        f" `{data[0].capitalize()} - {active_esim[0][-4:]}`"
+                                        "\n\n*📖 Инструкция по установке:*"
+                                        " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
+                                        " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"
+                                        " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
+                                        " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
+                                        " | [Google Pixel](https://telegra.ph/Kak-podklyuchit-eSIM-na-Pixel-08-24)"
+                                        "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
+                                        f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_SIMPLE_LINK}"
+                                        "\n\n🤖 Также вы можете посмотреть подробную информацию о ваших eSIM"
+                                        " с помощью команды /get\_my\_esims или перейти в главное меню "
+                                        "/menu")
+
+
+async def add_new_esim_after_payment(chat_id, data, cli, bnesim, downloading_message):
+    product_id = db_get_product_id(data[0], data[1])
+    active_esim = bnesim.activate_esim(cli, product_id)
+    while active_esim[1] is None:
+        await asyncio.sleep(1)
+    db_clean_data(chat_id)
+    await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
+    await Config.BOT.send_photo(chat_id=chat_id, photo=BufferedInputFile(active_esim[1],
+                                                                         "png_qr_code.png"),
+                                caption="🎊 Спасибо за приобретение новой eSIM!"
+                                        "\n\n📛 *Название вашей eSIM:*"
+                                        f" `{data[0].capitalize()} - {active_esim[0][-4:]}`"
+                                        "\n\n*Инструкция по установке:*"
+                                        " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
+                                        " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"
+                                        " | [Samsung](https://telegra.ph/Kak-podklyuchit-eSIM-na-Samsung-08-18)"
+                                        " | [Huawei](https://telegra.ph/Kak-podklyuchit-eSIM-na-Huawei-08-18)"
+                                        " | [Google Pixel](https://telegra.ph/Kak-podklyuchit-eSIM-na-Pixel-08-24)"
+                                        "\n\n🏝️ Если во время установки у вас возникли какие-либо сложности,"
+                                        f" обратитесь в службу заботы клиента eSIM Unity: {Config.SUPPORT_SIMPLE_LINK}"
+                                        "\n\n🤖 Также вы можете посмотреть подробную информацию о ваших eSIM"
+                                        " с помощью команды /get\_my\_esims или перейти в главное меню "
+                                        "/menu")
+
+
+async def prolong_esim_after_payment(chat_id, top_up_data, cli, bnesim, downloading_message):
+    product_id = db_get_product_id(top_up_data["country"], top_up_data["volume"])
+    iccids_map = bnesim.get_iccids_of_user(cli)
+    if top_up_data["iccid"] in iccids_map["iccids"]:
+        api_answer = bnesim.top_up_existing_esim(cli, top_up_data["iccid"], product_id)
+        db_clean_top_up_data(chat_id)
+        while api_answer is None:
+            await asyncio.sleep(1)
+        await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
+        await Config.BOT.send_message("*🎊 Успешное продление eSIM!*"
+                               f"\n\n*📛 Название вашей eSIM:*"
+                               f" `{top_up_data["country"].capitalize()} - {top_up_data["iccid"][-4:]}`"
+                               f"\n\n🤖 Вы можете посмотреть инструкцию по установке и"
+                               f" подробную информацию о ваших eSIM с помощью команды /get\_my\_esims")
