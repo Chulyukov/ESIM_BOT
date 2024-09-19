@@ -5,7 +5,7 @@ from aiogram import Dispatcher
 from aiohttp import web
 
 from config import Config
-from core.commands import buy_esim, get_my_esims, donate, menu, start
+from core import c_start, c_menu, c_get_my_esims, c_buy_esim, delete_esim
 from robokassa_api import handle_result
 
 logging.basicConfig(level=logging.INFO)
@@ -16,11 +16,11 @@ bot = Config.BOT
 async def main() -> None:
     dp = Dispatcher()
 
-    dp.include_router(buy_esim.router)
-    dp.include_router(get_my_esims.router)
-    dp.include_router(donate.router)
-    dp.include_router(menu.router)
-    dp.include_router(start.router)
+    dp.include_router(c_buy_esim.router)
+    dp.include_router(c_get_my_esims.router)
+    dp.include_router(c_menu.router)
+    dp.include_router(delete_esim.router)
+    dp.include_router(c_start.router)
 
     app = web.Application()
     app.router.add_post('/payment-result', handle_result)

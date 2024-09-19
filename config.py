@@ -11,7 +11,7 @@ class Config:
     # Токен тестового телеграм-бота t.me/vdghasda_bot
     TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
-    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # Тестовый токен YOKASSA
     YOKASSA_TEST_TOKEN = "381764678:TEST:91407"
     # BNESIM креды

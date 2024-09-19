@@ -7,8 +7,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bnesim_api import BnesimApi
 from config import Config
-from core.commands.helpful_methods import get_plan_prices, pay_service
+from core.helpful_methods import get_plan_prices, pay_service
 from db.users.db_cli import db_get_cli
+from db.users.db_hidden_esims import db_get_hidden_esims
 from db.users.db_top_up_data import db_update_top_up_data_iccid_and_country
 
 router = Router()
@@ -16,8 +17,9 @@ router = Router()
 
 @router.message(Command("get_my_esims"))
 async def get_my_esims(message: Message):
+    chat_id = message.chat.id
     bnesim = BnesimApi()
-    cli = db_get_cli(message.chat.id)
+    cli = db_get_cli(chat_id)
 
     downloading_message = await message.answer("*🚀 Подождите, загружаю данные...*")
     iccids_map = bnesim.get_iccids_of_user(cli)
@@ -29,20 +31,23 @@ async def get_my_esims(message: Message):
         kb = InlineKeyboardBuilder().add(
             InlineKeyboardButton(text="Приобрести eSIM", callback_data="buy_esim")
         ).as_markup()
-        await Config.BOT.delete_message(chat_id=message.chat.id, message_id=downloading_message.message_id)
+        await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
         await message.answer(
             text="*💔 Мы не нашли у вас ни одной eSIM, но вы можете приобрести их, нажав кнопку ниже.*",
             reply_markup=kb
         )
     else:
         kb = InlineKeyboardBuilder()
+        hidden_esims = db_get_hidden_esims(chat_id)
         for iccid in iccids_map.get("iccids", []):
             esim_info = bnesim.get_esim_info(iccid)
             if esim_info is not None:
+                if hidden_esims is not None and iccid in hidden_esims:
+                    continue
                 kb.add(InlineKeyboardButton(text=f"{esim_info["country"]} - {iccid[-4:]}",
                                             callback_data=f"get_esim_info_{iccid}"))
         kb = kb.adjust(1).as_markup()
-        await Config.BOT.delete_message(chat_id=message.chat.id, message_id=downloading_message.message_id)
+        await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
         await message.answer(
             text="*👇 Выберите одну из ваших eSIM,"
                  " чтобы узнать подробную информацию о ней или продлить пакет интернета.*",
