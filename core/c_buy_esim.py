@@ -8,7 +8,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, Buffered
 from bnesim_api import BnesimApi
 from config import Config
 from core.helpful_methods import get_username, get_plan_prices, build_keyboard, prepare_payment_order, choose_country, \
-    handle_payment_order
+    handle_payment_order, handle_first_payment_order
 from db.db_bnesim_products import db_get_product_id
 from db.users.db_cli import db_get_cli, db_update_cli
 from db.users.db_data import db_update_data_country, db_get_all_data, db_clean_data
@@ -95,5 +95,9 @@ async def successful_payment(message: types.Message):
     top_up_flag = db_get_top_up_flag(chat_id)
     if cli is None:
         cli = bnesim.activate_user(f"{get_username(message)}_{chat_id}")
+        await handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message)
+    else:
+        await handle_payment_order(cli, bnesim, data, top_up_data,
+                                   top_up_flag, chat_id, downloading_message, iccids_list)
 
     await handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag, chat_id, downloading_message, iccids_list)

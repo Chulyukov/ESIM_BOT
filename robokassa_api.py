@@ -47,7 +47,7 @@ def generate_payment_link(
 
 
 async def handle_payment(request):
-    from core.helpful_methods import handle_payment_order
+    from core.helpful_methods import handle_payment_order, handle_first_payment_order
 
     data = await request.post()
     out_summ = data.get('OutSum')
@@ -68,6 +68,7 @@ async def handle_payment(request):
         username = db_get_username_by_invoice_id(invoice_id)
         if cli is None:
             cli = bnesim.activate_user(f"{username}_{chat_id}")
-
-        await handle_payment_order(cli, bnesim, data, top_up_data,
-                                   top_up_flag, chat_id, downloading_message, iccids_list)
+            await handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message)
+        else:
+            await handle_payment_order(cli, bnesim, data, top_up_data,
+                                       top_up_flag, chat_id, downloading_message, iccids_list)
