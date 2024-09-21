@@ -6,7 +6,7 @@ from aiohttp import web
 
 from config import Config
 from core import c_start, c_menu, c_get_my_esims, c_buy_esim, delete_esim
-from robokassa_api import handle_result
+from robokassa_api import handle_payment
 
 logging.basicConfig(level=logging.INFO)
 
@@ -23,7 +23,7 @@ async def main() -> None:
     dp.include_router(c_start.router)
 
     app = web.Application()
-    app.router.add_post('/payment-result', handle_result)
+    app.router.add_post('/payment-result', handle_payment)
 
     runner = web.AppRunner(app)
     await runner.setup()

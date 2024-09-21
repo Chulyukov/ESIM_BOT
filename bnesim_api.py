@@ -63,7 +63,7 @@ class BnesimApi:
             print("No auth token available for activating user")
             return None
         user = self._get(f"/license_activation/?auth_token={self.auth_token}&name={username}&plan=254")
-        return user.get("cli")
+        return user["cli"]
 
     def activate_esim(self, cli, product_id):
         if not self.auth_token:
@@ -71,7 +71,11 @@ class BnesimApi:
             return None
         esim = self._get("/sim_card_customer_activation/?"
                          f"auth_token={self.auth_token}&action=activate-esim&cli={cli}&plan={product_id}")
-        return [esim["iccid"], BytesIO(requests.get(esim["qr_code_url"]).content).read()]
+        result = {
+            "iccid": esim["iccid"],
+            "qr_code": BytesIO(requests.get(esim["qr_code_url"]).content).read(),
+        }
+        return result
 
     def get_iccids_of_user(self, cli):
         if not self.auth_token:
@@ -111,6 +115,7 @@ class BnesimApi:
             details = simcard_details["data_credit_details"][first_level_key][second_level_key]
 
             result = {
+                "ios_link": simcard_details["ios_universal_installation_link"],
                 "volume": round(details["associated_product"]["volume"] / 1024, 2),
                 "name": f"{round(details['associated_product']['volume'] / 1024, 2)}GB - {country}",
                 "country": country,

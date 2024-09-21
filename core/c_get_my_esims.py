@@ -7,7 +7,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bnesim_api import BnesimApi
 from config import Config
-from core.helpful_methods import get_plan_prices, pay_service
+from core.helpful_methods import get_plan_prices, prepare_payment_order
 from db.users.db_cli import db_get_cli
 from db.users.db_hidden_esims import db_get_hidden_esims
 from db.users.db_top_up_data import db_update_top_up_data_iccid_and_country
@@ -71,6 +71,7 @@ async def get_esim_info(callback: CallbackQuery):
         photo=BufferedInputFile(esim_info["qr_code_image"], "png_qr_code.png"),
         caption=f"*📛 Название eSIM:* `{esim_info['country'].capitalize()} - {iccid[-4:]}`"
                 f"\n*🛜 Оставшийся интернет-трафик:* `{esim_info['remaining_data']} GB`"
+                f"\n*🔗 Ссылка для прямой установки на IOS:* `{esim_info['ios_link']}`"
                 "\n\n*📖 Инструкция по установке:*"
                 " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
                 " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"
@@ -127,9 +128,9 @@ async def top_up_choose_plan_star(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("top_up_pay_rub_"))
 async def top_up_pay_rub(callback: CallbackQuery):
-    await pay_service(callback, 'RUB', True)
+    await prepare_payment_order(callback, 'RUB', True)
 
 
 @router.callback_query(F.data.startswith("top_up_pay_stars_"))
 async def top_up_pay_star(callback: CallbackQuery):
-    await pay_service(callback, 'XTR', True)
+    await prepare_payment_order(callback, 'XTR', True)
