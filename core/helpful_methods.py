@@ -65,15 +65,14 @@ def get_plan_prices(currency, chat_id, is_top_up=False):
     # Определяем множитель в зависимости от валюты
     multiplier = (
         Config.EURO_EXCHANGE_RATE if currency == 'RUB'
-        else Config.EURO_EXCHANGE_RATE / 1.3
+        else Config.EURO_EXCHANGE_RATE / 1.5
     )
 
     # Рассчитываем цены для каждого плана
     prices = {}
     for plan in [3, 5, 10, 20]:
         price = float(price_data[plan]["price"])
-        percentage_of_profit = float(price_data[plan]["percentage_of_profit"])
-        prices[plan] = int(price * percentage_of_profit * multiplier)
+        prices[plan] = int(price * multiplier * 1.04 * Config.PERCENT_OF_STONX)
 
     return prices
 

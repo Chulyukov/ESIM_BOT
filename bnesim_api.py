@@ -1,6 +1,5 @@
 import re
 from io import BytesIO
-from pprint import pprint
 
 import requests
 
@@ -31,23 +30,25 @@ class BnesimApi:
     def get_auth_token(self) -> str:
         response = self._get(
             f"/auth_request/?partner_login={Config.BNESIM_PARTNER_LOGIN}&api_key={Config.BNESIM_API_KEY}&context=admin")
-        auth_token = response.get("auth_token")
+        auth_token = response["auth_token"]
         if not auth_token:
             print("Failed to retrieve auth token")
         return auth_token
 
     def get_products_catalog(self):
+        count = 0
         product_list = self._get("/partners_pricing/?format=json&a=928G")
-        pattern = r'^Surf (3|5|10|20)+GB in [A-Za-z0-9 ]+ (for|per) 30 days$'
+        main_pattern = r"^Surf (3|5|10|20)+GB in [A-Za-z0-9 ]+ (for|per) 30 days$"
+        country_pattern = r" in (.*?) (for|per) "
         new_data = {}
         for product in product_list:
-            product_name = product.get("product_name")
-            if product_name and re.match(pattern, product_name) and \
-                    any(product_name.split(" ")[3].lower() == country for country in
-                        ["egypt", "turkey", "thailand", "georgia", "italy", "europe"]):
-                country = product_name.split(" ")[3].lower()
-                volume = int(product_name.split(" ")[1].replace("GB", ""))
-                price = str(product["price"])
+            product_name = product["product_name"]
+            if product_name and re.match(main_pattern, product_name):
+                count += 1
+                match = re.search(country_pattern, product_name)
+                country = match.group(1).strip().lower()
+                volume = product["volume"]
+                price = float(product["price"])
                 product_id = product["id"]
 
                 new_data[product_id] = {
@@ -55,7 +56,7 @@ class BnesimApi:
                     "volume": volume,
                     "price": price,
                 }
-                db_insert_bnesim_products(product_id, country, volume, price)
+        db_insert_bnesim_products(new_data)
         return new_data
 
     def activate_user(self, username):

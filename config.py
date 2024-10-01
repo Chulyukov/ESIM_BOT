@@ -11,7 +11,7 @@ class Config:
     # Токен тестового телеграм-бота t.me/vdghasda_bot
     TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
     # Сущность бота
-    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # Тестовый токен YOKASSA
     YOKASSA_TEST_TOKEN = "381764678:TEST:91407"
     # BNESIM креды
@@ -31,6 +31,8 @@ class Config:
     CHANNEL_LINK = "https://t.me/esim_unity"
     # YOKASSA TOKEN
     YUKASSA_LIVE_TOKEN = "390540012:LIVE:36227"
+    # Процент наценки
+    PERCENT_OF_STONX = 1.20
     # Курс евро
     EURO_EXCHANGE_RATE = 102
     # Robokassa

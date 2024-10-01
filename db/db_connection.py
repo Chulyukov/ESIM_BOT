@@ -17,14 +17,20 @@ def get_database_connection():
         print("Проблема с подключением к БД: ", err)
 
 
-def execute_query(err_msg, query, params=None):
-    """Выполняем запрос с переподключением к бд при необходимости"""
+def execute_query(err_msg, query, params=None, multiple=False):
+    """
+    Выполняем запрос с переподключением к БД при необходимости.
+    multiple: Если True, используем executemany для обработки нескольких строк.
+    """
     connection = get_database_connection()
     if connection is None:
         return None
     cursor = connection.cursor()
     try:
-        cursor.execute(query, params)
+        if multiple:
+            cursor.executemany(query, params)  # Для множества значений
+        else:
+            cursor.execute(query, params)     # Для одного запроса
         result = cursor.fetchall()
         return result
     except mysql.connector.Error as err:
