@@ -1,10 +1,10 @@
 from db.db_connection import execute_query
 
 
-def db_save_invoice_user(invoice_id, chat_id, username):
+def db_save_invoice_user(invoice_id, chat_id, username, date):
     execute_query("Ошибка при добавлении записи в payments",
-                  "INSERT INTO payments (invoice_id, chat_id, username) VALUES (%s, %s, %s)",
-                  (invoice_id, chat_id, username,))
+                  "INSERT INTO payments (invoice_id, chat_id, username, date) VALUES (%s, %s, %s, %s)",
+                  (invoice_id, chat_id, username, date,))
 
 
 def db_get_chat_id_by_invoice_id(invoice_id):

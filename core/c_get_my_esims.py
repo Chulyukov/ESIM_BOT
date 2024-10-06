@@ -69,7 +69,7 @@ async def get_esim_info(callback: CallbackQuery):
     await Config.BOT.send_photo(
         chat_id=callback.message.chat.id,
         photo=BufferedInputFile(esim_info["qr_code_image"], "png_qr_code.png"),
-        caption=f"*📛 Название eSIM:* `{esim_info['country'].capitalize()} - {iccid[-4:]}`"
+        caption=f"*📛 Название eSIM:* `{esim_info['country'].title()} - {iccid[-4:]}`"
                 f"\n*🛜 Оставшийся интернет-трафик:* `{esim_info['remaining_data']} GB`"
                 f"\n*🔗 Ссылка для прямой установки на IOS:* {esim_info['ios_link'].replace("_", "\_")}"
                 "\n\n*📖 Инструкция по установке:*"

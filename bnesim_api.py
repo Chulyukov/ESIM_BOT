@@ -36,17 +36,20 @@ class BnesimApi:
         return auth_token
 
     def get_products_catalog(self):
-        count = 0
         product_list = self._get("/partners_pricing/?format=json&a=928G")
-        main_pattern = r"^Surf (3|5|10|20)+GB in [A-Za-z0-9 ]+ (for|per) 30 days$"
+        main_pattern_1 = r"^Surf (3|5|10|20)+GB in [A-Za-z0-9 ]+ (for|per) 30 days$"
+        main_pattern_2 = r"^Surf (3|5|10|20)+GB (for|per) 30 days in [A-Za-z0-9 ]+$"
+        main_pattern_3 = r"^Surf (3|5|10|20)+GB/30 days in [A-Za-z0-9 ]+$"
         country_pattern = r" in (.*?) (for|per) "
         new_data = {}
         for product in product_list:
             product_name = product["product_name"]
-            if product_name and re.match(main_pattern, product_name):
-                count += 1
-                match = re.search(country_pattern, product_name)
-                country = match.group(1).strip().lower()
+            if product_name and (re.match(main_pattern_1, product_name) or re.match(main_pattern_2, product_name) or re.match(main_pattern_3, product_name)):
+                if re.match(main_pattern_1, product_name):
+                    match = re.search(country_pattern, product_name)
+                    country = match.group(1).strip().lower()
+                elif re.match(main_pattern_2, product_name) or re.match(main_pattern_3, product_name):
+                    country = product_name.split(" in ")[-1].lower()
                 volume = product["volume"]
                 price = float(product["price"])
                 product_id = product["id"]
@@ -109,7 +112,7 @@ class BnesimApi:
 
         simcard_details = response["simcard_details"]
         if simcard_details["data_credit_verbose"] != "":
-            country = simcard_details["data_credit_verbose"].split(" ")[3].replace("<br>", "")
+            country = re.search(r"in (.+?) (valid|\d)", simcard_details["data_credit_verbose"]).group(1).strip()
 
             first_level_key = next(iter(simcard_details["data_credit_details"]))
             second_level_key = next(iter(simcard_details["data_credit_details"][first_level_key]))

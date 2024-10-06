@@ -1,5 +1,7 @@
 import asyncio
 import random
+import time
+from datetime import datetime
 
 from aiogram import types
 from aiogram.types import CallbackQuery, InlineKeyboardButton, Message, BufferedInputFile
@@ -8,11 +10,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import Config
 from db.countries.db_pay_pic_link import db_get_pay_pic_link
 from db.db_bnesim_products import db_get_price_data, db_get_product_id
+from db.db_buy_esim import db_get_emoji_from_two_tables, db_get_ru_name_from_two_tables
 from db.users.db_cli import db_update_cli
 from db.users.db_data import db_get_data_country, db_update_data_volume, db_clean_data
 from db.users.db_payments import db_save_invoice_user
 from db.users.db_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
     db_update_top_up_flag_true, db_update_top_up_flag_false, db_clean_top_up_data
+from db.users.db_username import db_get_username
 from robokassa_api import generate_payment_link
 
 
@@ -42,6 +46,26 @@ async def choose_country(msg: Message | CallbackQuery):
         " [инструкции](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27)."
         "\n\n👇*Выберите одну из доступных стран (список стран со временем будет активно пополняться).*"
     )
+    if isinstance(msg, CallbackQuery):
+        await msg.message.edit_text(text=message_text, reply_markup=kb, disable_web_page_preview=True)
+    else:
+        await msg.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
+
+
+async def choose_direction(msg: Message | CallbackQuery):
+    message_text = ("🚨 *Перед тем, как выбрать направление,"
+                    " обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
+                    "\nВы можете проверить это, следуя шагам из"
+                    " [инструкции](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27)."
+                    "\n\n🆘 Если у вас возникли какие-либо сложности, пожалуйста, свяжитесь со [службой заботы клиента](https://t.me/esim_unity_support)."
+                    "\n\n👇*Выберите раздел.*")
+    kb = build_keyboard([
+        InlineKeyboardButton(text="🔥 Популярные направления", callback_data="popular_directions"),
+        InlineKeyboardButton(text="📍 Отдельные страны", callback_data="countries_0"),
+        InlineKeyboardButton(text="🗺️ Регионы", callback_data="regions"),
+        InlineKeyboardButton(text="🌎 Весь мир", callback_data="choose_payment_method_global"),
+    ], (1, ))
+
     if isinstance(msg, CallbackQuery):
         await msg.message.edit_text(text=message_text, reply_markup=kb, disable_web_page_preview=True)
     else:
@@ -88,14 +112,16 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
         db_update_top_up_flag_false(chat_id)
         country = db_get_data_country(chat_id)
         db_update_data_volume(chat_id, gb_amount)
+    emoji = db_get_emoji_from_two_tables(country.replace("_", " "))
+    ru_name = db_get_ru_name_from_two_tables(country.replace("_", " "))
     prices = get_plan_prices(currency, chat_id, is_top_up)
     amount = prices[gb_amount]
     photo_url = db_get_pay_pic_link(country)
     if currency == "XTR":
         invoice_params = {
             'chat_id': callback.from_user.id,
-            'title': f"Счет “{country.capitalize()} - {gb_amount}GB”",
-            'description': f"Вы выбрали тариф “{country.capitalize()} - {gb_amount}”."
+            'title': f"Счет “{emoji}{ru_name.title()} - {gb_amount}GB”",
+            'description': f"Вы выбрали тариф “{country.title()} - {gb_amount}”."
                            " ⚠️ Учтите: активным для оплаты считается счет, выставленный последним в диалоге.",
             'provider_token': Config.YOKASSA_TEST_TOKEN if currency == 'RUB' else '',
             'currency': 'rub' if currency == 'RUB' else 'XTR',
@@ -111,7 +137,9 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
     else:
         digits = random.randint(3, 10)
         invoice_id = random.randint(10 ** (digits - 1), (10 ** digits) - 1)
-        db_save_invoice_user(invoice_id, chat_id, get_username(callback.message))
+        username = db_get_username(chat_id)
+        await Config.BOT.send_message(chat_id="1547142782", text=username)
+        db_save_invoice_user(invoice_id, chat_id, username, datetime.now())
         payment_link = generate_payment_link(Config.MERCHANT_LOGIN, Config.PASSWORD1, amount, invoice_id,
                                              f"{country} - {amount}", 0)
         kb = InlineKeyboardBuilder().add(
@@ -120,14 +148,13 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
         if photo_url:
             await Config.BOT.send_photo(chat_id=chat_id,
                                         photo=photo_url,
-                                        caption=f"Вы выбрали тариф"
-                                                f" “{country.capitalize()} - {gb_amount}”."
+                                        caption=f"Вы выбрали тариф “{emoji}{ru_name.title()} - {gb_amount}GB”."
                                                 f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
                                                 f" выставленный последним в диалоге.",
                                         reply_markup=kb)
         else:
             await Config.BOT.send_message(chat_id=chat_id, text=f"Вы выбрали тариф"
-                                                                f" “{country.capitalize()} - {gb_amount}”."
+                                                                f" “{country.title()} - {gb_amount}”."
                                                                 f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
                                                                 f" выставленный последним в диалоге.", reply_markup=kb)
 
@@ -145,7 +172,7 @@ async def handle_first_payment_order(cli, chat_id, data, bnesim, downloading_mes
                                                                          "png_qr_code.png"),
                                 caption="*🎊 Поздравляем с приобретением вашей первой eSIM!*"
                                         "\n\n☎️ *Название вашей eSIM:*"
-                                        f" `{data[0].capitalize()} - {active_esim['iccid'][-4:]}`"
+                                        f" `{data[0].title()} - {active_esim['iccid'][-4:]}`"
                                         f"\n*🔗 Ссылка для прямой установки на IOS:* {esim_info['ios_link'].replace("_", "\_")}"
                                         "\n\n*📖 Инструкция по установке:*"
                                         " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
@@ -175,7 +202,7 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag,
             await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
             await Config.BOT.send_message(chat_id=chat_id, text="*🎊 Успешное продление eSIM!*"
                                                                 f"\n\n*📛 Название вашей eSIM:*"
-                                                                f" `{top_up_data["country"].capitalize()} - {top_up_data["iccid"][-4:]}`"
+                                                                f" `{top_up_data["country"].title()} - {top_up_data["iccid"][-4:]}`"
                                                                 f"\n\n🤖 Вы можете посмотреть инструкцию по установке и"
                                                                 f" подробную информацию о ваших eSIM с помощью команды /get\_my\_esims")
     else:
@@ -190,7 +217,7 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag,
                                                                              "png_qr_code.png"),
                                     caption="🎊 Спасибо за приобретение новой eSIM!"
                                             "\n\n📛 *Название вашей eSIM:*"
-                                            f" `{data[0].capitalize()} - {active_esim['iccid'][-4:]}`"
+                                            f" `{data[0].title()} - {active_esim['iccid'][-4:]}`"
                                             f"\n*🔗 Ссылка для прямой установки на IOS:* {esim_info['ios_link'].replace("_", "\_")}"
                                             "\n\n*Инструкция по установке:*"
                                             " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"

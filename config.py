@@ -9,9 +9,9 @@ class Config:
     # Токен телеграм-бота t.me/esim_unity_bot
     TOKEN = "7210348872:AAGDZsDcTsAszxGEhCNBCmmZkbSRC5n868c"
     # Токен тестового телеграм-бота t.me/vdghasda_bot
-    TEST_TOKEN = "7454139393:AAGvzYI_Jlmeq9oijARYzPlBoRJOfbaqytE"
+    TEST_TOKEN = "8101981246:AAGwNiazPZliWFFMItehFeFO8HCQ0fgIUJA"
     # Сущность бота
-    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # Тестовый токен YOKASSA
     YOKASSA_TEST_TOKEN = "381764678:TEST:91407"
     # BNESIM креды

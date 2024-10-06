@@ -3,12 +3,8 @@ import decimal
 import hashlib
 from urllib import parse
 
-from aiogram.types import BufferedInputFile
-from aiohttp import web
-
 from bnesim_api import BnesimApi
 from config import Config
-from db.db_bnesim_products import db_get_product_id
 from db.users.db_cli import db_get_cli, db_update_cli
 from db.users.db_data import db_get_all_data, db_clean_data
 from db.users.db_payments import db_update_payment_status, db_get_chat_id_by_invoice_id, db_get_username_by_invoice_id
