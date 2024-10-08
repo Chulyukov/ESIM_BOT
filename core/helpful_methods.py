@@ -1,6 +1,5 @@
 import asyncio
 import random
-import time
 from datetime import datetime
 
 from aiogram import types
@@ -28,35 +27,12 @@ def get_username(message):
     return username
 
 
-async def choose_country(msg: Message | CallbackQuery):
-    buttons = [
-        InlineKeyboardButton(text="🇹🇷Турция", callback_data="choose_payment_method_turkey"),
-        InlineKeyboardButton(text="🇹🇭Тайланд", callback_data="choose_payment_method_thailand"),
-        InlineKeyboardButton(text="🇬🇪Грузия", callback_data="choose_payment_method_georgia"),
-        InlineKeyboardButton(text="🇪🇬Египет", callback_data="choose_payment_method_egypt"),
-        InlineKeyboardButton(text="🇮🇹Италия", callback_data="choose_payment_method_italy"),
-        InlineKeyboardButton(text="🇪🇺Европа", callback_data="choose_payment_method_europe"),
-    ]
-    kb = build_keyboard(buttons, (2,))
-
-    message_text = (
-        "🚨 *Перед тем, как выбрать страну,"
-        " обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
-        "\nВы можете проверить это, следуя шагам из"
-        " [инструкции](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27)."
-        "\n\n👇*Выберите одну из доступных стран (список стран со временем будет активно пополняться).*"
-    )
-    if isinstance(msg, CallbackQuery):
-        await msg.message.edit_text(text=message_text, reply_markup=kb, disable_web_page_preview=True)
-    else:
-        await msg.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
-
-
 async def choose_direction(msg: Message | CallbackQuery):
     message_text = ("🚨 *Перед тем, как выбрать направление,"
                     " обязательно удостоверьтесь в том, что ваш смартфон поддерживает технологию eSIM*."
                     "\nВы можете проверить это, следуя шагам из"
                     " [инструкции](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27)."
+                    "\n\n🔍 Вы можете в любое время *ввести название страны* на русском или английском языке, и *бот покажет все подходящие варианты.* Просто напишите название, и вы получите список стран, соответствующих вашему запросу!"
                     "\n\n🆘 Если у вас возникли какие-либо сложности, пожалуйста, свяжитесь со [службой заботы клиента](https://t.me/esim_unity_support)."
                     "\n\n👇*Выберите раздел.*")
     kb = build_keyboard([

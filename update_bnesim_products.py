@@ -1,10 +1,12 @@
 import asyncio
+import os
 from datetime import datetime
+
 from aiogram.types import FSInputFile  # Импортируем класс FSInputFile для отправки файла
+
 from bnesim_api import BnesimApi
 from config import Config
 from db.db_bnesim_products import db_get_bnesim_products
-import os
 
 
 async def update_products():

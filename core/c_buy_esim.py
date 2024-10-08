@@ -1,11 +1,11 @@
 from aiogram import Router, F, types
 from aiogram.enums import ContentType
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, BufferedInputFile
+from aiogram.types import Message, CallbackQuery, InlineKeyboardButton
 
 from bnesim_api import BnesimApi
 from config import Config
-from core.helpful_methods import get_username, get_plan_prices, build_keyboard, prepare_payment_order, choose_country, \
+from core.helpful_methods import get_username, get_plan_prices, build_keyboard, prepare_payment_order, \
     handle_payment_order, handle_first_payment_order, choose_direction
 from db.countries.db_countries import db_get_20_countries
 from db.db_buy_esim import db_get_emoji_from_two_tables, db_get_ru_name_from_two_tables
@@ -28,14 +28,14 @@ async def choose_popular_direction(callback: CallbackQuery):
     kb = build_keyboard([
         InlineKeyboardButton(text="🇹🇷 Турция", callback_data="choose_payment_method_turkey"),
         InlineKeyboardButton(text="🇹🇭 Тайланд", callback_data="choose_payment_method_thailand"),
-        InlineKeyboardButton(text="🇬🇪 Грузия", callback_data="choose_payment_method_georgia"),
+        InlineKeyboardButton(text="🇦🇪 Объединенные Арабские Эмираты", callback_data="choose_payment_method_united_arab_emirates"),
         InlineKeyboardButton(text="🇪🇬 Египет", callback_data="choose_payment_method_egypt"),
         InlineKeyboardButton(text="🇬🇷 Греция", callback_data="choose_payment_method_greece"),
         InlineKeyboardButton(text="🇻🇳 Вьетнам", callback_data="choose_payment_method_vietnam"),
         InlineKeyboardButton(text="🇪🇸 Испания", callback_data="choose_payment_method_spain"),
-        InlineKeyboardButton(text="🇨🇳Китай", callback_data="choose_payment_method_china"),
-        InlineKeyboardButton(text="🇯🇵 Япония", callback_data="choose_payment_method_japan"),
-        InlineKeyboardButton(text="🇮🇹 Италия", callback_data="choose_payment_method_italy"),
+        InlineKeyboardButton(text="🇮🇩 Индонезия", callback_data="choose_payment_method_indonesia"),
+        InlineKeyboardButton(text="🇨🇳 Китай", callback_data="choose_payment_method_china"),
+        InlineKeyboardButton(text="🇨🇾 Кипр", callback_data="choose_payment_method_cyprus"),
         InlineKeyboardButton(text="⏪ К выбору направлений", callback_data="buy_esim"),
     ], (2, 2, 2, 2, 2, 1))
     await callback.message.edit_text(
@@ -101,6 +101,11 @@ async def choose_region(callback: CallbackQuery):
         reply_markup=kb, disable_web_page_preview=True)
 
 
+@router.callback_query(F.data == "search")
+async def search(callback: CallbackQuery):
+    await callback.message.answer("⌨️ В поле ввода сообщения вы можете ввести название интересующего вас направления.")
+
+
 @router.callback_query(F.data.startswith("choose_payment_method_"))
 async def choose_payment_method(callback: CallbackQuery):
     country = callback.data.split("choose_payment_method_")[1]
@@ -138,6 +143,7 @@ async def choose_plan_rub(callback: CallbackQuery):
     buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data=f"choose_payment_method_{country}"))
     kb = build_keyboard(buttons, (2, 2, 1))
     await callback.message.edit_text(text="💳 Оплачивая российской картой, вы соглашаетесь с"
+                                          " [условиями использования сервиса](https://telegra.ph/Kak-proishodit-oplata-v-bote-09-05)."
                                           "\n\n🆘 Если у вас возникли какие-либо сложности, пожалуйста, свяжитесь со [службой заботы клиента](https://t.me/esim_unity_support)."
                                           "\n\n*👇 Выберите интересующий вас пакет интернета.*",
                                      reply_markup=kb,
