@@ -11,7 +11,7 @@ from db.countries.db_pay_pic_link import db_get_pay_pic_link
 from db.db_bnesim_products import db_get_price_data, db_get_product_id
 from db.db_buy_esim import db_get_emoji_from_two_tables, db_get_ru_name_from_two_tables
 from db.users.db_cli import db_update_cli
-from db.users.db_data import db_get_data_country, db_update_data_volume, db_clean_data
+from db.users.db_data import db_get_data_country, db_update_data_volume, db_clean_data, db_get_all_data
 from db.users.db_payments import db_save_invoice_user
 from db.users.db_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
     db_update_top_up_flag_true, db_update_top_up_flag_false, db_clean_top_up_data
@@ -144,7 +144,6 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
                                                 f" выставленный последним в диалоге.",
                                         reply_markup=kb,
                                         parse_mode="HTML")
-            print(admin_text)
             await Config.BOT.send_message(chat_id="1547142782", text=admin_text, parse_mode="HTML")
             await Config.BOT.send_photo(chat_id="1547142782",
                                         photo=photo_url,
@@ -170,7 +169,7 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
 
 
 async def handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message):
-    product_id = db_get_product_id(data[0], data[1])
+    product_id = db_get_product_id(data["country"], data["volume"])
     db_update_cli(chat_id, cli)
     active_esim = bnesim.activate_esim(cli, product_id)
     esim_info = bnesim.get_esim_info(active_esim["iccid"])
@@ -182,7 +181,7 @@ async def handle_first_payment_order(cli, chat_id, data, bnesim, downloading_mes
                                                                          "png_qr_code.png"),
                                 caption="*🎊 Поздравляем с приобретением вашей первой eSIM!*"
                                         "\n\n☎️ *Название вашей eSIM:*"
-                                        f" `{data[0].title()} - {active_esim['iccid'][-4:]}`"
+                                        f" `{data["country"].title()} - {active_esim['iccid'][-4:]}`"
                                         f"\n*🔗 Ссылка для прямой установки на IOS:* {esim_info['ios_link'].replace("_", "\_")}"
                                         "\n\n*📖 Инструкция по установке:*"
                                         " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
@@ -216,7 +215,7 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag,
                                                                 f"\n\n🤖 Вы можете посмотреть инструкцию по установке и"
                                                                 f" подробную информацию о ваших eSIM с помощью команды /get\_my\_esims")
     else:
-        product_id = db_get_product_id(data[0], data[1])
+        product_id = db_get_product_id(data["country"], data["volume"])
         active_esim = bnesim.activate_esim(cli, product_id)
         esim_info = bnesim.get_esim_info(active_esim["iccid"])
         while active_esim["qr_code"] is None:
@@ -227,7 +226,7 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag,
                                                                              "png_qr_code.png"),
                                     caption="🎊 Спасибо за приобретение новой eSIM!"
                                             "\n\n📛 *Название вашей eSIM:*"
-                                            f" `{data[0].title()} - {active_esim['iccid'][-4:]}`"
+                                            f" `{data["country"].title()} - {active_esim['iccid'][-4:]}`"
                                             f"\n*🔗 Ссылка для прямой установки на IOS:* {esim_info['ios_link'].replace("_", "\_")}"
                                             "\n\n*Инструкция по установке:*"
                                             " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"

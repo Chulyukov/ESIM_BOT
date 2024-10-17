@@ -43,6 +43,6 @@ def db_get_data_country(chat_id):
 def db_get_all_data(chat_id):
     """Получаем users.data.country & volume"""
     result = execute_query("Ошибка при получении users.data.country & volume",
-                           "SELECT JSON_EXTRACT(data, '$.country', '$.volume') FROM users WHERE chat_id = %s",
+                           "SELECT data FROM users WHERE chat_id = %s",
                            (chat_id,))[0][0]
     return json.loads(result) if result else None

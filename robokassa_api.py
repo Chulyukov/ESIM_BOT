@@ -1,4 +1,4 @@
-import decimal
+import asyncio
 import decimal
 import hashlib
 from urllib import parse
@@ -56,15 +56,16 @@ async def handle_payment(request):
     if signature.lower() == expected_signature.lower():
         bnesim = BnesimApi()
         cli = db_get_cli(chat_id)
-        data = db_get_all_data(chat_id)
+        data_default = db_get_all_data(chat_id)
         top_up_data = db_get_all_top_up_data(chat_id)
         downloading_message = await Config.BOT.send_message(chat_id, "*🚀 Подождите, обрабатываю данные платежа...*")
+        await asyncio.sleep(5)
         iccids_list = bnesim.get_iccids_of_user(cli)
         top_up_flag = db_get_top_up_flag(chat_id)
         username = db_get_username_by_invoice_id(invoice_id)
         if cli is None:
             cli = bnesim.activate_user(f"{username}_{chat_id}")
-            await handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message)
+            await handle_first_payment_order(cli, chat_id, data_default, bnesim, downloading_message)
         else:
-            await handle_payment_order(cli, bnesim, data, top_up_data,
+            await handle_payment_order(cli, bnesim, data_default, top_up_data,
                                        top_up_flag, chat_id, downloading_message, iccids_list)
