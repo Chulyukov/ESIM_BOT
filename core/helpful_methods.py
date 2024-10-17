@@ -40,7 +40,7 @@ async def choose_direction(msg: Message | CallbackQuery):
         InlineKeyboardButton(text="📍 Отдельные страны", callback_data="countries_0"),
         InlineKeyboardButton(text="🗺️ Регионы", callback_data="regions"),
         InlineKeyboardButton(text="🌎 Весь мир", callback_data="choose_payment_method_global"),
-    ], (1, ))
+    ], (1,))
 
     if isinstance(msg, CallbackQuery):
         await msg.message.edit_text(text=message_text, reply_markup=kb, disable_web_page_preview=True)
@@ -78,21 +78,33 @@ def get_plan_prices(currency, chat_id, is_top_up=False):
 
 
 async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=False):
-    chat_id = callback.message.chat.id
+    admin_text = ""
+    chat_id = str(callback.message.chat.id)
+    admin_text += f"chat_id: {chat_id}\n"
     gb_amount = int(callback.data.split("_")[-1])
+    admin_text += f"gb: {gb_amount}\n"
     if is_top_up:
+        admin_text += f"top_up: {is_top_up}\n"
         db_update_top_up_flag_true(chat_id)
         country = db_get_top_up_data_country(chat_id)
+        admin_text += f"country: {country}\n"
         db_update_top_up_data_volume(chat_id, gb_amount)
     else:
+        admin_text += f"top_up: {is_top_up}\n"
         db_update_top_up_flag_false(chat_id)
         country = db_get_data_country(chat_id)
+        admin_text += f"country: {country}\n"
         db_update_data_volume(chat_id, gb_amount)
     emoji = db_get_emoji_from_two_tables(country.replace("_", " "))
+    admin_text += f"emoji: {emoji}\n"
     ru_name = db_get_ru_name_from_two_tables(country.replace("_", " "))
+    admin_text += f"ru_name: {ru_name}\n"
     prices = get_plan_prices(currency, chat_id, is_top_up)
+    admin_text += f"prices: {prices}\n"
     amount = prices[gb_amount]
+    admin_text += f"amount: {amount}\n"
     photo_url = db_get_pay_pic_link(country)
+    admin_text += f"currency: {currency}\n"
     if currency == "XTR":
         invoice_params = {
             'chat_id': callback.from_user.id,
@@ -109,15 +121,18 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
                                           amount=amount * 100 if currency == 'RUB' else amount)],
             'payload': "test-invoice-payload"
         }
+        await Config.BOT.send_message(chat_id="1547142782", text=admin_text)
         await Config.BOT.send_invoice(**invoice_params)
     else:
         digits = random.randint(3, 10)
         invoice_id = random.randint(10 ** (digits - 1), (10 ** digits) - 1)
+        admin_text += f"invoice_id: {invoice_id}\n"
         username = db_get_username(chat_id)
-        await Config.BOT.send_message(chat_id="1547142782", text=username)
+        admin_text += f"username: {username}\n"
         db_save_invoice_user(invoice_id, chat_id, username, datetime.now())
         payment_link = generate_payment_link(Config.MERCHANT_LOGIN, Config.PASSWORD1, amount, invoice_id,
                                              f"{country} - {amount}", 0)
+        admin_text += f"payment_link: {payment_link}\n"
         kb = InlineKeyboardBuilder().add(
             InlineKeyboardButton(text="💳 Оплатить", url=payment_link)
         ).as_markup()
@@ -127,12 +142,31 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
                                         caption=f"Вы выбрали тариф “{emoji}{ru_name.title()} - {gb_amount}GB”."
                                                 f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
                                                 f" выставленный последним в диалоге.",
-                                        reply_markup=kb)
+                                        reply_markup=kb,
+                                        parse_mode="HTML")
+            print(admin_text)
+            await Config.BOT.send_message(chat_id="1547142782", text=admin_text, parse_mode="HTML")
+            await Config.BOT.send_photo(chat_id="1547142782",
+                                        photo=photo_url,
+                                        caption=f"Вы выбрали тариф “{emoji}{ru_name.title()} - {gb_amount}GB”."
+                                                f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
+                                                f" выставленный последним в диалоге.",
+                                        reply_markup=kb,
+                                        parse_mode="HTML")
         else:
             await Config.BOT.send_message(chat_id=chat_id, text=f"Вы выбрали тариф"
-                                                                f" “{country.title()} - {gb_amount}”."
+                                                                f" “{emoji}{ru_name.title()} - {gb_amount}”."
                                                                 f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
-                                                                f" выставленный последним в диалоге.", reply_markup=kb)
+                                                                f" выставленный последним в диалоге.",
+                                          reply_markup=kb,
+                                          parse_mode="HTML")
+            await Config.BOT.send_message(chat_id="1547142782", text=admin_text, parse_mode="HTML")
+            await Config.BOT.send_message(chat_id="1547142782", text=f"Вы выбрали тариф"
+                                                                     f" “{emoji}{ru_name.title()} - {gb_amount}”."
+                                                                     f"\n\n⚠️ Учтите: активным для оплаты считается счет,"
+                                                                     f" выставленный последним в диалоге.",
+                                          reply_markup=kb,
+                                          parse_mode="HTML")
 
 
 async def handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message):

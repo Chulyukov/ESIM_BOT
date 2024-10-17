@@ -28,7 +28,7 @@ def db_update_top_up_data_volume(chat_id, volume):
 
 
 def db_update_top_up_flag_true(chat_id):
-    """Выставляем top_up_flag = 0"""
+    """Выставляем top_up_flag = 1"""
     execute_query("Ошибка при добавлении top_up_flag",
                   "UPDATE users SET top_up_flag = 1 WHERE chat_id = %s",
                   (chat_id,))
