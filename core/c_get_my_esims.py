@@ -42,7 +42,7 @@ async def get_my_esims(message: Message):
         for iccid in iccids_map.get("iccids", []):
             esim_info = bnesim.get_esim_info(iccid)
             if esim_info is not None:
-                if hidden_esims is not None and iccid in hidden_esims:
+                if hidden_esims is not None and iccid in hidden_esims["esims"]:
                     continue
                 kb.add(InlineKeyboardButton(text=f"{esim_info["country"]} - {iccid[-4:]}",
                                             callback_data=f"get_esim_info_{iccid}"))
