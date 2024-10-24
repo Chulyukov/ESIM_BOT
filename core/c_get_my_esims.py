@@ -40,10 +40,10 @@ async def get_my_esims(message: Message):
         kb = InlineKeyboardBuilder()
         hidden_esims = db_get_hidden_esims(chat_id)
         for iccid in iccids_map.get("iccids", []):
+            if hidden_esims is not None and iccid in hidden_esims["esims"]:
+                continue
             esim_info = bnesim.get_esim_info(iccid)
             if esim_info is not None:
-                if hidden_esims is not None and iccid in hidden_esims["esims"]:
-                    continue
                 kb.add(InlineKeyboardButton(text=f"{esim_info["country"]} - {iccid[-4:]}",
                                             callback_data=f"get_esim_info_{iccid}"))
         kb = kb.adjust(1).as_markup()
