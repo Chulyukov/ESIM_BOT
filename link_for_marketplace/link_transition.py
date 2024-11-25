@@ -42,7 +42,6 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
         instructions_link = Config.QUESTIONS_LINK  # TODO: поменять ссылку на актуальную, как только Саша сделает инструкцию по установке на все девайсы в одной странице
         emoji = db_get_emoji_from_two_tables(country)
         country = f"{db_get_ru_name_from_two_tables(country).capitalize()} {emoji}"
-        gb_amount = f"{gb_amount} ГБ  📶"
         bnesim = BnesimApi()
         if data[1] == "unactivated":
             # Проводим основные действия бизнес-логики
@@ -51,6 +50,7 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
             active_esim = bnesim.activate_esim("558948184", product_id)  # Активируем esim на пользователя admin с cli = 558948184
             db_update_iccid(active_esim["iccid"], uuid)  # Добавляем iccid к записи в таблице links
             # Итоговые данные для отображения
+            gb_amount = f"{gb_amount} ГБ  📶"
             ios_universal_installation_link = active_esim["ios_universal_installation_link"]
             qr_code = base64.b64encode(active_esim["qr_code_url"]).decode('utf-8')
             # Передача данных в шаблон
@@ -65,6 +65,8 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
         else:
             iccid = db_get_iccid(uuid)
             esim_info = bnesim.get_esim_info(iccid)
+            # Итоговые данные для отображения
+            gb_amount = esim_info["remaining_data"]
             ios_universal_installation_link = esim_info["ios_link"]
             qr_code = base64.b64encode(io.BytesIO(requests.get(esim_info["qr_code_url"]).content).read()).decode('utf-8')
             return render_template(
