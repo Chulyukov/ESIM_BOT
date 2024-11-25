@@ -1,0 +1,154 @@
+/* Общие стили */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Выстраиваем элементы по вертикали */
+    min-height: 100vh; /* Высота страницы равна высоте окна браузера */
+    background-color: #0c2b40;
+    color: #fff;
+}
+
+/* Внешний контейнер */
+.outer-container {
+    flex: 1; /* Контент растягивается на всю доступную высоту */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Контент выравнивается сверху */
+    background-color: #0c2b40;
+    padding: 20px;
+}
+
+/* Внутренний контейнер */
+.inner-container {
+    text-align: center;
+    background-color: #122c3c;
+    padding: 20px;
+    max-width: 996px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    width: 100%; /* Растягиваем контейнер по ширине */
+    border-radius: 10px;
+}
+
+/* Контейнер для изображения */
+.image-container {
+    display: inline-block;
+    background-color: #1b4a5a;
+    border: 3px solid #fff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.image-container img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Стили для текста и ссылок */
+.details {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+    font-size: 1.2rem;
+}
+
+/* Блок ссылок */
+.links {
+    text-align: left;
+    margin-top: 20px;
+    font-size: 1rem;
+}
+
+/* Блок с логотипами */
+.logo-links {
+    display: flex;
+    flex-direction: column; /* Вертикальное расположение элементов */
+    gap: 10px; /* Расстояние между элементами */
+}
+
+/* Элемент с логотипом */
+.logo-item {
+    display: flex;
+    align-items: center;
+    background-color: #1b4a5a;
+    border-radius: 25px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Логотипы */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1b4a5a;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+.logo-container img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Ссылки */
+.logo-link {
+    flex: 1;
+    color: #00c8ff;
+    text-decoration: none;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link:hover {
+    text-decoration: underline;
+    color: #fff;
+}
+
+/* Элемент ссылки */
+.link-item {
+    margin-bottom: 20px;
+}
+
+.link {
+    display: block;
+    background-color: #1b4a5a;
+    color: #00c8ff;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 1rem;
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.link:hover {
+    background-color: #00a1d6;
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Футер */
+.footer {
+    text-align: center;
+    padding: 20px 20px 0;
+    background-color: #122c3c;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 400;
+    border-top: 1px solid #1b4a5a;
+}
+.footer .brand {
+    font-weight: 700;
+    color: #00c8ff;
+}

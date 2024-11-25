@@ -15,7 +15,7 @@ class BnesimApi:
         self.auth_token = self.get_auth_token()
 
     def _request(self, method: str, path: str, **kwargs) -> dict:
-        url = f"{self.base_url}/{path}"
+        url = f"{self.base_url}{path}"
         try:
             response = self.session.request(method, url, verify=False, headers=self.headers, **kwargs)
             response.raise_for_status()
@@ -78,6 +78,8 @@ class BnesimApi:
         result = {
             "iccid": esim["iccid"],
             "qr_code": BytesIO(requests.get(esim["qr_code_url"]).content).read(),
+            "qr_code_url": esim["qr_code_url"],
+            "ios_universal_installation_link": esim["ios_universal_installation_link"],
         }
         return result
 
@@ -112,7 +114,8 @@ class BnesimApi:
 
         simcard_details = response["simcard_details"]
         if simcard_details["data_credit_verbose"] != "":
-            country = re.search(r"in (.+?) (valid|\d)", simcard_details["data_credit_verbose"]).group(1).strip()
+            country = re.search(r"<b>[\d,]+\.\d+ MB</b> in (.+?)(?: valid till \d{2}/\d{2}/\d{4})?<br>",
+                                simcard_details["data_credit_verbose"]).group(1).strip()
 
             first_level_key = next(iter(simcard_details["data_credit_details"]))
             second_level_key = next(iter(simcard_details["data_credit_details"][first_level_key]))
@@ -124,7 +127,8 @@ class BnesimApi:
                 "name": f"{round(details['associated_product']['volume'] / 1024, 2)}GB - {country}",
                 "country": country,
                 "remaining_data": round(details["remaining_mb"] / 1024, 2),
-                "qr_code_image": BytesIO(requests.get(simcard_details["qr_code_image"]).content).read()
+                "qr_code_image": BytesIO(requests.get(simcard_details["qr_code_image"]).content).read(),
+                "qr_code_url": simcard_details["qr_code_image"],
             }
 
         return result

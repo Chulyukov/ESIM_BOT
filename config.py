@@ -11,14 +11,18 @@ class Config:
     # Токен тестового телеграм-бота t.me/vdghasda_bot
     TEST_TOKEN = "8101981246:AAGwNiazPZliWFFMItehFeFO8HCQ0fgIUJA"
     # Сущность бота
-    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    # Полная ссылка на бота
+    BOT_LINK = "https://t.me/esim_unity_bot"
     # Тестовый токен YOKASSA
     YOKASSA_TEST_TOKEN = "381764678:TEST:91407"
+    # YOKASSA TOKEN
+    YUKASSA_LIVE_TOKEN = "390540012:LIVE:36227"
     # BNESIM креды
     BNESIM_PARTNER_LOGIN = "nikita.admin"
     BNESIM_API_KEY = "pe2mp9qxcen9"
     # БД
-    DB_HOST = "94.131.115.240"
+    DB_HOST = "213.108.20.201"
     DB_NAME = "esim_db"
     DB_USER = "esim_user"
     DB_PASS = "Kexibq528123!"
@@ -29,8 +33,6 @@ class Config:
     SUPPORT_SIMPLE_LINK = "@esim\_unity\_support"
     # Ссылка на канал
     CHANNEL_LINK = "https://t.me/esim_unity"
-    # YOKASSA TOKEN
-    YUKASSA_LIVE_TOKEN = "390540012:LIVE:36227"
     # Процент наценки
     PERCENT_OF_STONX = 1.20
     # Курс евро
