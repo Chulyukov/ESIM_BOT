@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='favicons/favicon.ico') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicons/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicons/site.webmanifest') }}">
+    <link rel="icon" sizes="192x192" href="{{ url_for('static', filename='favicons/android-chrome-192x192.png') }}">
+    <link rel="icon" sizes="512x512" href="{{ url_for('static', filename='favicons/android-chrome-512x512.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicons/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicons/favicon-32x32.png') }}">
+    <title>Возникла ошибка | eSIM Unity</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="outer-container">
+        <div class="inner-container">
+            <h1>Возникла ошибка</h1>
+            <p>При обработке вашего запроса возникла непредвиденная ошибка, пожалуйста, обратитесь в поддержку,
+                предоставив им вашу ссылку для активации eSIM.</p>
+            <div class="links">
+                <div class="link-item">
+                    <p>💬 <strong>Поддержка</strong></p>
+                    <div class="logo-links">
+                        <div class="logo-item">
+                            <div class="logo-container">
+                                <img src="{{ url_for('static', filename='images/telegram-logo.png') }}" alt="Telegram">
+                            </div>
+                            <a href="https://t.me/esim_unity_support" target="_blank" class="logo-link">Напишите нам в Telegram</a>
+                        </div>
+                        <div class="logo-item">
+                            <div class="logo-container">
+                                <img src="{{ url_for('static', filename='images/whatsapp-logo.png') }}" alt="WhatsApp">
+                            </div>
+                            <a href="https://wa.me/22943343372" target="_blank" class="logo-link">Свяжитесь с нами в WhatsApp</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer">
+                <strong>Путешествуйте с <span class="brand">eSIM Unity</span> — интернет всегда под рукой в любой точке мира!</strong>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

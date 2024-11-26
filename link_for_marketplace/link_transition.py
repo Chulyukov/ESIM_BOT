@@ -3,7 +3,11 @@ import requests
 from flask import Flask, render_template
 import base64
 import redis
+import logging
+import os
 
+
+from logging.handlers import RotatingFileHandler
 from bnesim_api import BnesimApi
 from config import Config
 from db.db_bnesim_products import db_get_product_id
@@ -15,7 +19,28 @@ from link_for_marketplace.db_link import db_get_esim_data, db_switch_status_on_a
 app = Flask(__name__, static_folder='static')
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
-CACHE_TTL = 1800  # TTL для кэширования в секундах
+CACHE_TTL = 120  # TTL для кэширования в секундах
+
+# Формируем путь относительно текущего файла
+log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs/error_page.log")
+
+# Настройка логирования
+log_formatter = logging.Formatter(
+    "\n%(asctime)s - %(levelname)s - %(message)s => %(exc_info)s"
+)
+
+# Создаём обработчик для записи в файл
+file_handler = RotatingFileHandler(log_file_path, maxBytes=10*1024*1024, backupCount=5)
+file_handler.setLevel(logging.ERROR)
+file_handler.setFormatter(log_formatter)
+
+# Настройка основного логгера
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)  # Логируем только ERROR и выше
+logger.addHandler(file_handler)
+
+# Отключение логов Flask сервера в консоль
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
 
 def generate_qr_code(data_url):
@@ -57,6 +82,13 @@ def render_expired_page():
     )
 
 
+def render_error_page():
+    """Рендеринг страницы с ошибкой"""
+    return render_template(
+        'error_page.html',
+    )
+
+
 @app.route('/<country>/<gb_amount>/<uuid>')
 def welcome_page(country: str, gb_amount: str, uuid: str):
     cache_key = f"esim:{country}:{gb_amount}:{uuid}"
@@ -67,22 +99,18 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
         return cached_page
 
     try:
-        # Проверка статуса ссылки
         status = db_get_link_status(uuid)
         if status == "unactivated":
             db_fill_date(uuid)
 
-        # Получение данных eSIM
         data = db_get_esim_data(uuid)
         if (datetime.now() - data[0]).days >= 30:
             return render_expired_page()
 
-        # Получение информации о стране
         country_info = get_country_info(country)
         instructions_link = Config.QUESTIONS_LINK
         bnesim = BnesimApi()
 
-        # Логика для неактивированного eSIM
         if data[1] == "unactivated":
             db_switch_status_on_activated(uuid)
             product_id = db_get_product_id(country, int(gb_amount))
@@ -93,7 +121,6 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
             ios_link = active_esim["ios_universal_installation_link"]
             qr_code = generate_qr_code(active_esim["qr_code_url"])
         else:
-            # Логика для активированного eSIM
             iccid = db_get_iccid(uuid)
             esim_info = bnesim.get_esim_info(iccid)
 
@@ -101,13 +128,14 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
             ios_link = esim_info["ios_link"]
             qr_code = generate_qr_code(esim_info["qr_code_url"])
 
-        # Рендеринг и кэширование страницы
         rendered_page = render_esim_page(country_info, gb_amount_display, ios_link, qr_code, instructions_link)
         cache_page(cache_key, CACHE_TTL, rendered_page)
         return rendered_page
 
     except Exception as e:
-        return f"Ошибка: {str(e)}\n\nПросьба прислать скриншот в поддержку Telegram https://t.me/esim_unity_support или в WhatsApp https://wa.me/22943343372", 500
+        # Логируем только ошибки
+        logger.error(f"{uuid} : {str(e)}\n", exc_info=True)
+        return render_error_page(), 500
 
 
 if __name__ == '__main__':
