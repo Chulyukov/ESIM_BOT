@@ -28,3 +28,4 @@ yarl==1.9.4
 Flask~=3.1.0
 flask-talisman~=1.1.0
 qrcode~=8.0
+Booktype~=1.5
