@@ -89,7 +89,7 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
             active_esim = bnesim.activate_esim("558948184", product_id)
             db_update_iccid(active_esim["iccid"], uuid)
 
-            gb_amount_display = f"{gb_amount} ГБ 📶"
+            gb_amount_display = f"{gb_amount}.0"
             ios_link = active_esim["ios_universal_installation_link"]
             qr_code = generate_qr_code(active_esim["qr_code_url"])
         else:
