@@ -28,7 +28,7 @@ def db_get_link_status(esim_id):
         "SELECT status FROM links WHERE id=%s",
         (esim_id,),
     )
-    return result[0] if result else None
+    return result[0][0] if result else None
 
 
 def db_switch_status_on_activated(esim_id):
@@ -41,7 +41,7 @@ def db_switch_status_on_activated(esim_id):
 def db_fill_date(esim_id):
     """Заполняем дату"""
     execute_query("Ошибка при переключении статуса на activated",
-                  "UPDATE links SET created_at=NOW() WHERE id=%s",
+                  "UPDATE links SET status='activated' AND created_at=NOW() WHERE id=%s",
                   (esim_id,))
 
 

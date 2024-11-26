@@ -107,7 +107,7 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
         return rendered_page
 
     except Exception as e:
-        return f"Ошибка: {str(e)}", 500
+        return f"Ошибка: {str(e)}\n\nПросьба прислать скриншот в поддержку Telegram https://t.me/esim_unity_support или в WhatsApp https://wa.me/22943343372", 500
 
 
 if __name__ == '__main__':
