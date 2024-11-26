@@ -5,7 +5,7 @@ def db_insert_esims(esims):
     """Добавляем новую ссылку для маркетплейса"""
     execute_query(
         "Ошибка при добавлении ссылки для маркетплейса",
-        "INSERT INTO links (id, country, gb_amount, status, created_at) VALUES (%s, %s, %s, 'unactivated', NOW())",
+        "INSERT INTO links (id, country, gb_amount, status) VALUES (%s, %s, %s, 'unactivated')",
         [(link["id"], link["country"], link["gb_amount"]) for link in esims],
         multiple=True
     )
@@ -24,7 +24,7 @@ def db_get_esim_data(esim_id):
 def db_switch_status_on_activated(esim_id):
     """Переключаем статус на activated"""
     execute_query("Ошибка при переключении статуса на activated",
-                  "UPDATE links SET status='activated' WHERE id=%s",
+                  "UPDATE links SET status='activated' AND created_at=NOW() WHERE id=%s",
                   (esim_id,))
 
 
