@@ -114,7 +114,7 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
         if data[1] == "unactivated":
             db_switch_status_on_activated(uuid)
             product_id = db_get_product_id(country, int(gb_amount))
-            active_esim = bnesim.activate_esim("558948184", product_id)
+            active_esim = bnesim.activate_esim("558947250", product_id)
             db_update_iccid(active_esim["iccid"], uuid)
 
             gb_amount_display = f"{gb_amount}.0"
