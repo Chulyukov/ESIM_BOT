@@ -26,16 +26,16 @@ async def buy_esim(msg: Message | CallbackQuery):
 @router.callback_query(F.data == "popular_directions")
 async def choose_popular_direction(callback: CallbackQuery):
     kb = build_keyboard([
-        InlineKeyboardButton(text="🇹🇷 Турция", callback_data="choose_payment_method_turkey"),
-        InlineKeyboardButton(text="🇹🇭 Тайланд", callback_data="choose_payment_method_thailand"),
-        InlineKeyboardButton(text="🇦🇪 Объединенные Арабские Эмираты", callback_data="choose_payment_method_united_arab_emirates"),
-        InlineKeyboardButton(text="🇪🇬 Египет", callback_data="choose_payment_method_egypt"),
-        InlineKeyboardButton(text="🇬🇷 Греция", callback_data="choose_payment_method_greece"),
-        InlineKeyboardButton(text="🇻🇳 Вьетнам", callback_data="choose_payment_method_vietnam"),
-        InlineKeyboardButton(text="🇪🇸 Испания", callback_data="choose_payment_method_spain"),
-        InlineKeyboardButton(text="🇮🇩 Индонезия", callback_data="choose_payment_method_indonesia"),
-        InlineKeyboardButton(text="🇨🇳 Китай", callback_data="choose_payment_method_china"),
-        InlineKeyboardButton(text="🇨🇾 Кипр", callback_data="choose_payment_method_cyprus"),
+        InlineKeyboardButton(text="🇹🇷 Турция", callback_data="choose_plan_rub_turkey"),
+        InlineKeyboardButton(text="🇹🇭 Тайланд", callback_data="choose_plan_rub_thailand"),
+        InlineKeyboardButton(text="🇦🇪 Объединенные Арабские Эмираты", callback_data="choose_plan_rub_united_arab_emirates"),
+        InlineKeyboardButton(text="🇪🇬 Египет", callback_data="choose_plan_rub_egypt"),
+        InlineKeyboardButton(text="🇬🇷 Греция", callback_data="choose_plan_rub_greece"),
+        InlineKeyboardButton(text="🇻🇳 Вьетнам", callback_data="choose_plan_rub_vietnam"),
+        InlineKeyboardButton(text="🇪🇸 Испания", callback_data="choose_plan_rub_spain"),
+        InlineKeyboardButton(text="🇮🇩 Индонезия", callback_data="choose_plan_rub_indonesia"),
+        InlineKeyboardButton(text="🇨🇳 Китай", callback_data="choose_plan_rub_china"),
+        InlineKeyboardButton(text="🇨🇾 Кипр", callback_data="choose_plan_rub_cyprus"),
         InlineKeyboardButton(text="⏪ К выбору направлений", callback_data="buy_esim"),
     ], (2, 2, 2, 2, 2, 1))
     await callback.message.edit_text(
@@ -53,7 +53,7 @@ async def choose_concrete_direction(callback: CallbackQuery):
     buttons = [
         InlineKeyboardButton(
             text=f"{emoji} {ru_name.title()}",
-            callback_data=f"choose_payment_method_{name.replace(' ', '_')}"
+            callback_data=f"choose_plan_rub_{name.replace(' ', '_')}"
         )
         for name, ru_name, emoji in countries
     ]
@@ -84,7 +84,7 @@ async def choose_region(callback: CallbackQuery):
     buttons = [
         InlineKeyboardButton(
             text=f"{emoji} {ru_name.title()}",
-            callback_data=f"choose_payment_method_{name.replace(' ', '_')}"
+            callback_data=f"choose_plan_rub_{name.replace(' ', '_')}"
         )
         for name, ru_name, emoji in regions
     ]
@@ -106,29 +106,29 @@ async def search(callback: CallbackQuery):
     await callback.message.answer("⌨️ В поле ввода сообщения вы можете ввести название интересующего вас направления.")
 
 
-@router.callback_query(F.data.startswith("choose_payment_method_"))
-async def choose_payment_method(callback: CallbackQuery):
-    country = callback.data.split("choose_payment_method_")[1]
-    emoji = db_get_emoji_from_two_tables(country.replace("_", " "))
-    ru_name = db_get_ru_name_from_two_tables(country.replace("_", " "))
-    text = (f"*📍 Выбранное направление - *`{emoji}{ru_name.title()}`"
-            f"\n\n*👇 Выберите способ оплаты.*")
-    if country == "global":
-        text = ("*🌍 Хотите узнать, как подключиться к интернету с помощью eSIM в разных странах мира?* Ознакомьтесь с нашей статьей, в которой подробно расписаны страны, входящие в глобальные eSIM-пакеты, и особенности подключения."
-            "\n\n*📱 Подробности читайте здесь:*"
-            "\n[Глобальные eSIM-пакеты: Страны и особенности подключения](https://telegra.ph/Globalnye-eSIM-pakety-Strany-i-osobennosti-podklyucheniya-10-06)"
-            "\n\n🆘 Если у вас возникли какие-либо сложности, пожалуйста, свяжитесь со [службой заботы клиента](https://t.me/esim_unity_support)."
-            "\n\n*✈️ Путешествуйте с комфортом и всегда оставайтесь на связи!*")
-    db_update_data_country(callback.message.chat.id, callback.data.split("_")[-1])
-    buttons = [
-        InlineKeyboardButton(text="💳 Российская карта", callback_data=f"choose_plan_rub_{country}"),
-        InlineKeyboardButton(text="⭐️ Telegram Stars", callback_data=f"choose_plan_star_{country}"),
-        InlineKeyboardButton(text="⏪ К выбору направлений", callback_data="buy_esim")
-    ]
-    kb = build_keyboard(buttons, (1,))
-    await callback.message.edit_text(text=text,
-                                     reply_markup=kb,
-                                     disable_web_page_preview=True)
+# @router.callback_query(F.data.startswith("choose_payment_method_"))
+# async def choose_payment_method(callback: CallbackQuery):
+#     country = callback.data.split("choose_payment_method_")[1]
+#     emoji = db_get_emoji_from_two_tables(country.replace("_", " "))
+#     ru_name = db_get_ru_name_from_two_tables(country.replace("_", " "))
+#     text = (f"*📍 Выбранное направление - *`{emoji}{ru_name.title()}`"
+#             f"\n\n*👇 Выберите способ оплаты.*")
+#     if country == "global":
+#         text = ("*🌍 Хотите узнать, как подключиться к интернету с помощью eSIM в разных странах мира?* Ознакомьтесь с нашей статьей, в которой подробно расписаны страны, входящие в глобальные eSIM-пакеты, и особенности подключения."
+#             "\n\n*📱 Подробности читайте здесь:*"
+#             "\n[Глобальные eSIM-пакеты: Страны и особенности подключения](https://telegra.ph/Globalnye-eSIM-pakety-Strany-i-osobennosti-podklyucheniya-10-06)"
+#             "\n\n🆘 Если у вас возникли какие-либо сложности, пожалуйста, свяжитесь со [службой заботы клиента](https://t.me/esim_unity_support)."
+#             "\n\n*✈️ Путешествуйте с комфортом и всегда оставайтесь на связи!*")
+#     db_update_data_country(callback.message.chat.id, callback.data.split("_")[-1])
+#     buttons = [
+#         InlineKeyboardButton(text="💳 Российская карта", callback_data=f"choose_plan_rub_{country}"),
+#         InlineKeyboardButton(text="⭐️ Telegram Stars", callback_data=f"choose_plan_star_{country}"),
+#         InlineKeyboardButton(text="⏪ К выбору направлений", callback_data="buy_esim")
+#     ]
+#     kb = build_keyboard(buttons, (1,))
+#     await callback.message.edit_text(text=text,
+#                                      reply_markup=kb,
+#                                      disable_web_page_preview=True)
 
 
 @router.callback_query(F.data.startswith("choose_plan_rub_"))
@@ -140,7 +140,7 @@ async def choose_plan_rub(callback: CallbackQuery):
         InlineKeyboardButton(text=f"{gb} ГБ - {price} RUB", callback_data=f"pay_rub_{gb}")
         for gb, price in prices.items()
     ]
-    buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data=f"choose_payment_method_{country}"))
+    buttons.append(InlineKeyboardButton(text="⏪ К выбору направлений", callback_data="buy_esim"))
     kb = build_keyboard(buttons, (2, 2, 1))
     await callback.message.edit_text(text="💳 Оплачивая российской картой, вы соглашаетесь с"
                                           " [условиями использования сервиса](https://telegra.ph/Kak-proishodit-oplata-v-bote-09-05)."
@@ -150,22 +150,22 @@ async def choose_plan_rub(callback: CallbackQuery):
                                      disable_web_page_preview=True)
 
 
-@router.callback_query(F.data.startswith("choose_plan_star_"))
-async def choose_plan_star_card(callback: CallbackQuery):
-    country = callback.data.split("choose_plan_star_")[1]
-    db_update_data_country(callback.message.chat.id, country.replace("_", " "))
-    prices = get_plan_prices("XRT", callback.message.chat.id)
-    buttons = [
-        InlineKeyboardButton(text=f"{gb} ГБ - {price} STARS", callback_data=f"pay_stars_{gb}")
-        for gb, price in prices.items()
-    ]
-    buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data=f"choose_payment_method_{country}"))
-    kb = build_keyboard(buttons, (2, 2, 1))
-    await callback.message.edit_text(
-        text="🆘 Если у вас возникли какие-либо сложности, пожалуйста, свяжитесь со [службой заботы клиента](https://t.me/esim_unity_support)."
-             "\n\n*👇 Выберите интересующий вас пакет интернета.*",
-        reply_markup=kb,
-        disable_web_page_preview=True)
+# @router.callback_query(F.data.startswith("choose_plan_star_"))
+# async def choose_plan_star_card(callback: CallbackQuery):
+#     country = callback.data.split("choose_plan_star_")[1]
+#     db_update_data_country(callback.message.chat.id, country.replace("_", " "))
+#     prices = get_plan_prices("XRT", callback.message.chat.id)
+#     buttons = [
+#         InlineKeyboardButton(text=f"{gb} ГБ - {price} STARS", callback_data=f"pay_stars_{gb}")
+#         for gb, price in prices.items()
+#     ]
+#     buttons.append(InlineKeyboardButton(text="⏪ Назад", callback_data=f"choose_payment_method_{country}"))
+#     kb = build_keyboard(buttons, (2, 2, 1))
+#     await callback.message.edit_text(
+#         text="🆘 Если у вас возникли какие-либо сложности, пожалуйста, свяжитесь со [службой заботы клиента](https://t.me/esim_unity_support)."
+#              "\n\n*👇 Выберите интересующий вас пакет интернета.*",
+#         reply_markup=kb,
+#         disable_web_page_preview=True)
 
 
 @router.callback_query(F.data.startswith("pay_rub_"))
@@ -173,31 +173,31 @@ async def pay_rub(callback: CallbackQuery):
     await prepare_payment_order(callback, "RUB")
 
 
-@router.callback_query(F.data.startswith("pay_stars_"))
-async def pay_star(callback: CallbackQuery):
-    await prepare_payment_order(callback, "XTR")
+# @router.callback_query(F.data.startswith("pay_stars_"))
+# async def pay_star(callback: CallbackQuery):
+#     await prepare_payment_order(callback, "XTR")
 
 
-@router.pre_checkout_query(lambda query: True)
-async def pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery):
-    await Config.BOT.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
-
-
-@router.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
-async def successful_payment(message: types.Message):
-    chat_id = message.chat.id
-    bnesim = BnesimApi()
-    cli = db_get_cli(chat_id)
-    data = db_get_all_data(chat_id)
-    top_up_data = db_get_all_top_up_data(chat_id)
-    downloading_message = await message.answer("*🚀 Подождите, обрабатываю данные платежа...*")
-    iccids_list = bnesim.get_iccids_of_user(cli)
-    top_up_flag = db_get_top_up_flag(chat_id)
-    if cli is None:
-        cli = bnesim.activate_user(f"{get_username(message)}_{chat_id}")
-        await handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message)
-    else:
-        await handle_payment_order(cli, bnesim, data, top_up_data,
-                                   top_up_flag, chat_id, downloading_message, iccids_list)
-
-    await handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag, chat_id, downloading_message, iccids_list)
+# @router.pre_checkout_query(lambda query: True)
+# async def pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery):
+#     await Config.BOT.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+#
+#
+# @router.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
+# async def successful_payment(message: types.Message):
+#     chat_id = message.chat.id
+#     bnesim = BnesimApi()
+#     cli = db_get_cli(chat_id)
+#     data = db_get_all_data(chat_id)
+#     top_up_data = db_get_all_top_up_data(chat_id)
+#     downloading_message = await message.answer("*🚀 Подождите, обрабатываю данные платежа...*")
+#     iccids_list = bnesim.get_iccids_of_user(cli)
+#     top_up_flag = db_get_top_up_flag(chat_id)
+#     if cli is None:
+#         cli = bnesim.activate_user(f"{get_username(message)}_{chat_id}")
+#         await handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message)
+#     else:
+#         await handle_payment_order(cli, bnesim, data, top_up_data,
+#                                    top_up_flag, chat_id, downloading_message, iccids_list)
+#
+#     await handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag, chat_id, downloading_message, iccids_list)

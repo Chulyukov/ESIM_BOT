@@ -64,7 +64,7 @@ async def get_esim_info(callback: CallbackQuery):
     db_update_top_up_data_iccid_and_country(callback.message.chat.id, iccid, esim_info["country"])
 
     kb = InlineKeyboardBuilder().add(
-        InlineKeyboardButton(text="Продлить", callback_data="top_up_choose_payment_method_")
+        InlineKeyboardButton(text="Продлить", callback_data="top_up_choose_plan_rub")
     ).as_markup()
     await Config.BOT.send_photo(
         chat_id=callback.message.chat.id,
@@ -85,17 +85,17 @@ async def get_esim_info(callback: CallbackQuery):
     )
 
 
-@router.callback_query(F.data.startswith("top_up_choose_payment_method_"))
-async def top_up_choose_payment_method(callback: CallbackQuery):
-    kb = InlineKeyboardBuilder().add(
-        InlineKeyboardButton(text="💳 Российская карта", callback_data="top_up_choose_plan_rub"),
-        InlineKeyboardButton(text="⭐️ Telegram Stars", callback_data="top_up_choose_plan_star")
-    ).adjust(1).as_markup()
-
-    if callback.data.split("_")[-1] == "back":
-        await callback.message.edit_text("*👇 Выберите способ оплаты.*", reply_markup=kb)
-    else:
-        await callback.message.answer("*👇 Выберите способ оплаты.*", reply_markup=kb)
+# @router.callback_query(F.data.startswith("top_up_choose_payment_method_"))
+# async def top_up_choose_payment_method(callback: CallbackQuery):
+#     kb = InlineKeyboardBuilder().add(
+#         InlineKeyboardButton(text="💳 Российская карта", callback_data="top_up_choose_plan_rub"),
+#         InlineKeyboardButton(text="⭐️ Telegram Stars", callback_data="top_up_choose_plan_star")
+#     ).adjust(1).as_markup()
+#
+#     if callback.data.split("_")[-1] == "back":
+#         await callback.message.edit_text("*👇 Выберите способ оплаты.*", reply_markup=kb)
+#     else:
+#         await callback.message.answer("*👇 Выберите способ оплаты.*", reply_markup=kb)
 
 
 @router.callback_query(F.data == "top_up_choose_plan_rub")
@@ -103,34 +103,33 @@ async def top_up_choose_plan_russian(callback: CallbackQuery):
     prices = get_plan_prices("RUB", callback.message.chat.id, True)
     kb = (InlineKeyboardBuilder().add(
         *[InlineKeyboardButton(text=f"{gb} ГБ - {price} RUB",
-                               callback_data=f"top_up_pay_rub_{gb}") for gb, price in prices.items()],
-        InlineKeyboardButton(text="⏪ Назад", callback_data="top_up_choose_payment_method_back")
-    ).adjust(2, 2, 1).as_markup())
+                               callback_data=f"top_up_pay_rub_{gb}") for gb, price in prices.items()]
+        # InlineKeyboardButton(text="⏪ Назад", callback_data="top_up_choose_plan_rub_back")
+    ).adjust(2, 2).as_markup())
 
-    await callback.message.edit_text(text="💳 Оплачивая российской картой, вы соглашаетесь с"
-                                          " [условиями использования сервиса](https://telegra.ph/Kak-proishodit-oplata-v-bote-09-05)."
-                                          "\n\n*Выберите интересующий вас пакет интернета.*",
-                                     reply_markup=kb,
-                                     disable_web_page_preview=True)
+    await callback.message.answer(text="💳 Оплачивая российской картой, вы соглашаетесь с"
+                                       " [условиями использования сервиса](https://telegra.ph/Kak-proishodit-oplata-v-bote-09-05)."
+                                       "\n\n*Выберите интересующий вас пакет интернета.*",
+                                  reply_markup=kb,
+                                  disable_web_page_preview=True)
 
 
-@router.callback_query(F.data == "top_up_choose_plan_star")
-async def top_up_choose_plan_star(callback: CallbackQuery):
-    prices = get_plan_prices("XRT", callback.message.chat.id, True)
-    kb = InlineKeyboardBuilder().add(
-        *[InlineKeyboardButton(text=f"{gb} ГБ - {price} STARS",
-                               callback_data=f"top_up_pay_stars_{gb}") for gb, price in prices.items()],
-        InlineKeyboardButton(text="⏪ Назад", callback_data="top_up_choose_payment_method_back")
-    ).adjust(2, 2, 1).as_markup()
-
-    await callback.message.edit_text(text="*👇 Выберите интересующий вас объем интернет-трафика.*", reply_markup=kb)
+# @router.callback_query(F.data == "top_up_choose_plan_star")
+# async def top_up_choose_plan_star(callback: CallbackQuery):
+#     prices = get_plan_prices("XRT", callback.message.chat.id, True)
+#     kb = InlineKeyboardBuilder().add(
+#         *[InlineKeyboardButton(text=f"{gb} ГБ - {price} STARS",
+#                                callback_data=f"top_up_pay_stars_{gb}") for gb, price in prices.items()],
+#         InlineKeyboardButton(text="⏪ Назад", callback_data="top_up_choose_payment_method_back")
+#     ).adjust(2, 2, 1).as_markup()
+#
+#     await callback.message.edit_text(text="*👇 Выберите интересующий вас объем интернет-трафика.*", reply_markup=kb)
 
 
 @router.callback_query(F.data.startswith("top_up_pay_rub_"))
 async def top_up_pay_rub(callback: CallbackQuery):
     await prepare_payment_order(callback, 'RUB', True)
 
-
-@router.callback_query(F.data.startswith("top_up_pay_stars_"))
-async def top_up_pay_star(callback: CallbackQuery):
-    await prepare_payment_order(callback, 'XTR', True)
+# @router.callback_query(F.data.startswith("top_up_pay_stars_"))
+# async def top_up_pay_star(callback: CallbackQuery):
+#     await prepare_payment_order(callback, 'XTR', True)

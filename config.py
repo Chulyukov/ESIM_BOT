@@ -11,7 +11,7 @@ class Config:
     # Токен тестового телеграм-бота t.me/vdghasda_bot
     TEST_TOKEN = "8101981246:AAGwNiazPZliWFFMItehFeFO8HCQ0fgIUJA"
     # Сущность бота
-    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # Полная ссылка на бота
     BOT_LINK = "https://t.me/esim_unity_bot"
     # Тестовый токен YOKASSA
@@ -35,8 +35,7 @@ class Config:
     CHANNEL_LINK = "https://t.me/esim_unity"
     # Процент наценки
     PERCENT_OF_STONX = 1.20
-    # Курс евро
-    EURO_EXCHANGE_RATE = 102
+
     # Robokassa
     API_TOKEN = '7210348872:AAGDZsDcTsAszxGEhCNBCmmZkbSRC5n868c'
     WEBHOOK_HOST = 'https://esimunity.ru'
@@ -48,3 +47,7 @@ class Config:
     TEST_PASSWORD2 = 'xC74cTl3pe7Lr8IxVTzd'
     PASSWORD1 = 'O0aeVibKLOm5d2CO8R5t'
     PASSWORD2 = 'YaTobt46ilslW7eO07mU'
+
+    # YAM API
+    YAM_API_KEY = "ACMA:X5fc6XGwua2rD7YTWzD4leXSeCc7tYrxlN3T9KqR:c8b5d4b4"
+    YAM_CAMPAIGN_ID = 130152372

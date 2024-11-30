@@ -16,6 +16,7 @@ from db.users.db_payments import db_save_invoice_user
 from db.users.db_top_up_data import db_get_top_up_data_country, db_update_top_up_data_volume, \
     db_update_top_up_flag_true, db_update_top_up_flag_false, db_clean_top_up_data
 from db.users.db_username import db_get_username
+from get_euro_rate import get_euro_to_rub_rate
 from robokassa_api import generate_payment_link
 
 
@@ -64,8 +65,8 @@ def get_plan_prices(currency, chat_id, is_top_up=False):
 
     # Определяем множитель в зависимости от валюты
     multiplier = (
-        Config.EURO_EXCHANGE_RATE if currency == 'RUB'
-        else Config.EURO_EXCHANGE_RATE / 1.5
+        get_euro_to_rub_rate() if currency == 'RUB'
+        else get_euro_to_rub_rate() / 1.5
     )
 
     # Рассчитываем цены для каждого плана

@@ -29,3 +29,6 @@ Flask~=3.1.0
 flask-talisman~=1.1.0
 qrcode~=8.0
 Booktype~=1.5
+redis~=5.2.0
+pillow~=11.0.0
+beautifulsoup4~=4.12.3

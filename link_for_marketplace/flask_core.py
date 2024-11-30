@@ -6,7 +6,6 @@ import redis
 import logging
 import os
 
-
 from logging.handlers import RotatingFileHandler
 from bnesim_api import BnesimApi
 from config import Config
@@ -14,6 +13,7 @@ from db.db_bnesim_products import db_get_product_id
 from db.db_buy_esim import db_get_emoji_from_two_tables, db_get_ru_name_from_two_tables
 from link_for_marketplace.db_link import db_get_esim_data, db_switch_status_on_activated, db_update_iccid, db_get_iccid, \
     db_get_link_status, db_fill_date
+from robokassa_api import handle_payment
 
 # Инициализация Flask и Redis
 app = Flask(__name__, static_folder='static')
@@ -30,7 +30,7 @@ log_formatter = logging.Formatter(
 )
 
 # Создаём обработчик для записи в файл
-file_handler = RotatingFileHandler(log_file_path, maxBytes=10*1024*1024, backupCount=5)
+file_handler = RotatingFileHandler(log_file_path, maxBytes=10 * 1024 * 1024, backupCount=5)
 file_handler.setLevel(logging.ERROR)
 file_handler.setFormatter(log_formatter)
 
@@ -87,6 +87,11 @@ def render_error_page():
     return render_template(
         'error_page.html',
     )
+
+
+@app.route('/payment-result')
+async def payment_result(request):
+    await handle_payment(request)
 
 
 @app.route('/<country>/<gb_amount>/<uuid>')
