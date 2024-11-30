@@ -40,7 +40,7 @@ async def choose_direction(msg: Message | CallbackQuery):
         InlineKeyboardButton(text="🔥 Популярные направления", callback_data="popular_directions"),
         InlineKeyboardButton(text="📍 Отдельные страны", callback_data="countries_0"),
         InlineKeyboardButton(text="🗺️ Регионы", callback_data="regions"),
-        InlineKeyboardButton(text="🌎 Весь мир", callback_data="choose_payment_method_global"),
+        InlineKeyboardButton(text="🌎 Весь мир", callback_data="choose_plan_rub_global"),
     ], (1,))
 
     if isinstance(msg, CallbackQuery):

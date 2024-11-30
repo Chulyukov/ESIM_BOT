@@ -23,7 +23,7 @@ async def start_command(message: Message, state: FSMContext):
         coincidences = db_get_all_coincidences_by_search(user_text)
         if coincidences:
             buttons = [InlineKeyboardButton(text=f"{data["emoji"]} {data["ru_name"].title()}",
-                                            callback_data=f"choose_payment_method_{name}")
+                                            callback_data=f"choose_plan_rub_{name}")
                        for name, data in coincidences.items()]
             buttons.append(InlineKeyboardButton(text="⏪ К выбору направлений", callback_data="buy_esim"))
             kb = build_keyboard(buttons, (1,))
