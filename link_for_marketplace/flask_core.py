@@ -7,6 +7,7 @@ import logging
 import os
 import asyncio
 
+from asgiref.sync import async_to_sync
 from flask import request
 from logging.handlers import RotatingFileHandler
 from bnesim_api import BnesimApi
@@ -98,15 +99,11 @@ def payment_result():
         print("Request data (form):", request.form)
 
         if request.method == 'POST':
-            # Создаем новый цикл событий для асинхронной функции
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
             # Конвертируем данные POST-запроса из request.form
             post_data = request.form.to_dict()
 
-            # Передаем данные в handle_payment
-            loop.run_until_complete(handle_payment(post_data))
+            # Вызываем асинхронный метод через async_to_sync
+            async_to_sync(handle_payment)(post_data)
 
         return "OK", 200
     except Exception as e:
