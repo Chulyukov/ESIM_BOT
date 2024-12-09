@@ -5,6 +5,7 @@ import base64
 import redis
 import logging
 import os
+import asyncio
 
 from flask import request
 from logging.handlers import RotatingFileHandler
@@ -95,13 +96,12 @@ def payment_result():
     try:
         print("Request received:", request.method)
         print("Request data (form):", request.form)
-        print("Request data (args):", request.args)
 
-        # Проверяем Content-Type перед попыткой загрузить JSON
-        if request.is_json:
-            print("Request JSON:", request.get_json())
-        else:
-            print("Request is not JSON. Content-Type:", request.content_type)
+        # Проверяем, POST ли запрос
+        if request.method == 'POST':
+            # Обработка запроса handle_payment в асинхронной среде
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(handle_payment(request))
 
         return "OK", 200
     except Exception as e:
