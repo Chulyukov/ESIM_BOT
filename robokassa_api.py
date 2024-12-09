@@ -42,10 +42,9 @@ def generate_payment_link(
     return f'{robokassa_payment_url}?{parse.urlencode(data)}'
 
 
-async def handle_payment(request):
+async def handle_payment(data):
     from core.helpful_methods import handle_payment_order, handle_first_payment_order
 
-    data = await request.post()
     out_summ = data.get('OutSum')
     invoice_id = data.get('InvId')
     signature = data.get('SignatureValue')
