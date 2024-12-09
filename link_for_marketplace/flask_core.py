@@ -99,8 +99,9 @@ def payment_result():
 
         # Проверяем, POST ли запрос
         if request.method == 'POST':
-            # Обработка запроса handle_payment в асинхронной среде
-            loop = asyncio.get_event_loop()
+            # Создаем новый цикл событий для текущего потока
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
             loop.run_until_complete(handle_payment(request))
 
         return "OK", 200
