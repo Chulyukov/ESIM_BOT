@@ -6,6 +6,7 @@ import redis
 import logging
 import os
 
+from flask import request
 from logging.handlers import RotatingFileHandler
 from bnesim_api import BnesimApi
 from config import Config
@@ -90,7 +91,7 @@ def render_error_page():
 
 
 @app.route('/payment-result', methods=['GET', 'POST'])
-def payment_result(request):
+def payment_result():
     try:
         print("Request received:", request.method)
         print("Request data (form):", request.form)
