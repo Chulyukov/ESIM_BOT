@@ -89,9 +89,11 @@ def render_error_page():
     )
 
 
-@app.route('/payment-result', methods=['POST'])
+@app.route('/payment-result', methods=['GET', 'POST'])
 async def payment_result(request):
+    print("Request received:", request.form if request.method == 'POST' else request.args)
     await handle_payment(request)
+    return "OK", 200
 
 
 @app.route('/<country>/<gb_amount>/<uuid>')
