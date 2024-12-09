@@ -96,7 +96,13 @@ def payment_result():
         print("Request received:", request.method)
         print("Request data (form):", request.form)
         print("Request data (args):", request.args)
-        print("Request JSON:", request.get_json())
+
+        # Проверяем Content-Type перед попыткой загрузить JSON
+        if request.is_json:
+            print("Request JSON:", request.get_json())
+        else:
+            print("Request is not JSON. Content-Type:", request.content_type)
+
         return "OK", 200
     except Exception as e:
         logger.error(f"Error in /payment-result: {e}", exc_info=True)
