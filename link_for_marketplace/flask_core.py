@@ -90,10 +90,16 @@ def render_error_page():
 
 
 @app.route('/payment-result', methods=['GET', 'POST'])
-async def payment_result(request):
-    print("Request received:", request.form if request.method == 'POST' else request.args)
-    await handle_payment(request)
-    return "OK", 200
+def payment_result(request):
+    try:
+        print("Request received:", request.method)
+        print("Request data (form):", request.form)
+        print("Request data (args):", request.args)
+        print("Request JSON:", request.get_json())
+        return "OK", 200
+    except Exception as e:
+        logger.error(f"Error in /payment-result: {e}", exc_info=True)
+        return "Internal Server Error", 500
 
 
 @app.route('/<country>/<gb_amount>/<uuid>')
