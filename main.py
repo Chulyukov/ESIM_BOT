@@ -2,11 +2,9 @@ import asyncio
 import logging
 
 from aiogram import Dispatcher
-from aiohttp import web
 
 from config import Config
 from core import c_start, c_menu, c_get_my_esims, c_buy_esim, delete_esim
-from robokassa_api import handle_payment
 
 logging.basicConfig(level=logging.INFO)
 

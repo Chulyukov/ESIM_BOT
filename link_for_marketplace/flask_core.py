@@ -89,7 +89,7 @@ def render_error_page():
     )
 
 
-@app.route('/payment-result', methods=['GET', 'POST'])
+@app.route('/payment-result', methods=['POST'])
 async def payment_result(request):
     await handle_payment(request)
 
