@@ -73,7 +73,7 @@ def get_plan_prices(currency, chat_id, is_top_up=False):
     prices = {}
     for plan in [3, 5, 10, 20]:
         price = float(price_data[plan]["price"])
-        prices[plan] = int(price * multiplier * 1.04 * Config.PERCENT_OF_STONX)
+        prices[plan] = int(price * multiplier * 1.04 * 1.06 * 1.2 * 1.2 * 1.3)
 
     return prices
 
