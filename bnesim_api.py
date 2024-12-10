@@ -117,6 +117,8 @@ class BnesimApi:
             return {}
 
         simcard_details = response["simcard_details"]
+        result = None  # Инициализируем переменную result по умолчанию
+
         if simcard_details["data_credit_verbose"] != "":
             country = re.search(
                 r"<b>[\d,]+\.\d+ MB</b> in (.+?)(?: valid till \d{2}/\d{2}/\d{4})?<br>",
@@ -141,7 +143,7 @@ class BnesimApi:
                 "qr_code_url": simcard_details["qr_code_image"],
             }
 
-        return result
+        return result if result else {}
 
     async def top_up_existing_esim(self, cli, iccid, product_id):
         if not self.auth_token:
