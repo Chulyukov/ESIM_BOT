@@ -4,10 +4,9 @@ from datetime import datetime
 
 from aiogram.types import FSInputFile  # Импортируем класс FSInputFile для отправки файла
 
-from async_bnesim_api import AsyncBnesimApi
 from bnesim_api import BnesimApi
 from config import Config
-from db.db_bnesim_products import db_get_bnesim_products
+from db.db_queries import db_get_bnesim_products
 
 
 async def update_products():
