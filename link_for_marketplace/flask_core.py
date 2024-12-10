@@ -127,7 +127,7 @@ async def welcome_page(country: str, gb_amount: str, uuid: str):
         if data[1] == "unactivated":
             db_switch_status_on_activated(uuid)
             product_id = db_get_product_id(country, int(gb_amount))
-            active_esim = bnesim.activate_esim("558947250", product_id)
+            active_esim = await bnesim.activate_esim("558947250", product_id)
             db_update_iccid(active_esim["iccid"], uuid)
 
             gb_amount_display = f"{gb_amount}.0"
@@ -135,7 +135,7 @@ async def welcome_page(country: str, gb_amount: str, uuid: str):
             qr_code = await generate_qr_code(active_esim["qr_code_url"])
         else:
             iccid = db_get_iccid(uuid)
-            esim_info = bnesim.get_esim_info(iccid)
+            esim_info = await bnesim.get_esim_info(iccid)
 
             gb_amount_display = esim_info["remaining_data"]
             ios_link = esim_info["ios_link"]

@@ -22,7 +22,7 @@ async def get_my_esims(message: Message):
     cli = db_get_cli(chat_id)
 
     downloading_message = await message.answer("*🚀 Подождите, загружаю данные...*")
-    iccids_map = bnesim.get_iccids_of_user(cli)
+    iccids_map = await bnesim.get_iccids_of_user(cli)
 
     while iccids_map is None:
         await asyncio.sleep(1)
@@ -42,7 +42,7 @@ async def get_my_esims(message: Message):
         for iccid in iccids_map.get("iccids", []):
             if hidden_esims is not None and iccid in hidden_esims["esims"]:
                 continue
-            esim_info = bnesim.get_esim_info(iccid)
+            esim_info = await bnesim.get_esim_info(iccid)
             if esim_info is not None:
                 kb.add(InlineKeyboardButton(text=f"{esim_info["country"]} - {iccid[-4:]}",
                                             callback_data=f"get_esim_info_{iccid}"))
@@ -59,7 +59,7 @@ async def get_my_esims(message: Message):
 async def get_esim_info(callback: CallbackQuery):
     bnesim = BnesimApi()
     iccid = callback.data.split("_")[-1]
-    esim_info = bnesim.get_esim_info(iccid)
+    esim_info = await bnesim.get_esim_info(iccid)
 
     db_update_top_up_data_iccid_and_country(callback.message.chat.id, iccid, esim_info["country"])
 

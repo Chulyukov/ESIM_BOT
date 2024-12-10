@@ -172,8 +172,8 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
 async def handle_first_payment_order(cli, chat_id, data, bnesim, downloading_message):
     product_id = db_get_product_id(data["country"], data["volume"])
     db_update_cli(chat_id, cli)
-    active_esim = bnesim.activate_esim(cli, product_id)
-    esim_info = bnesim.get_esim_info(active_esim["iccid"])
+    active_esim = await bnesim.activate_esim(cli, product_id)
+    esim_info = await bnesim.get_esim_info(active_esim["iccid"])
     while cli is None and active_esim["qr_code"] is None:
         await asyncio.sleep(1)
     db_clean_data(chat_id)
@@ -203,9 +203,9 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag,
             and top_up_data["iccid"] in [item for item in iccids_list["iccids"]]
             and top_up_flag == 1):
         product_id = db_get_product_id(top_up_data["country"], top_up_data["volume"])
-        iccids_map = bnesim.get_iccids_of_user(cli)
+        iccids_map = await bnesim.get_iccids_of_user(cli)
         if top_up_data["iccid"] in iccids_map["iccids"]:
-            api_answer = bnesim.top_up_existing_esim(cli, top_up_data["iccid"], product_id)
+            api_answer = await bnesim.top_up_existing_esim(cli, top_up_data["iccid"], product_id)
             db_clean_top_up_data(chat_id)
             while api_answer is None:
                 await asyncio.sleep(1)
@@ -217,8 +217,8 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag,
                                                                 f" подробную информацию о ваших eSIM с помощью команды /get\_my\_esims")
     else:
         product_id = db_get_product_id(data["country"], data["volume"])
-        active_esim = bnesim.activate_esim(cli, product_id)
-        esim_info = bnesim.get_esim_info(active_esim["iccid"])
+        active_esim = await bnesim.activate_esim(cli, product_id)
+        esim_info = await bnesim.get_esim_info(active_esim["iccid"])
         while active_esim["qr_code"] is None:
             await asyncio.sleep(1)
         db_clean_data(chat_id)
