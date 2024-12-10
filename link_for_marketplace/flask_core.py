@@ -1,10 +1,10 @@
 from datetime import datetime
-import requests
 from quart import Quart, request, render_template
 import base64
 import redis
 import logging
 import os
+import httpx
 
 from logging.handlers import RotatingFileHandler
 from bnesim_api import BnesimApi
@@ -41,10 +41,11 @@ logger.addHandler(file_handler)
 
 
 async def generate_qr_code(data_url):
-    """Загрузка QR-кода по URL и конвертация в base64"""
-    async with requests.get(data_url) as response:
+    """Асинхронная загрузка QR-кода по URL и конвертация в base64"""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(data_url)
         response.raise_for_status()  # Обработка ошибок загрузки
-        return base64.b64encode(await response.content).decode("utf-8")
+        return base64.b64encode(response.content).decode("utf-8")
 
 
 def get_country_info(country):
