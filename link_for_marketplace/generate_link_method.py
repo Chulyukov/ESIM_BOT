@@ -33,7 +33,7 @@ def generate_qr_code(data, save_path=None):
     return img_base64
 
 
-def generate_links(esim_number, country, gb_amount):
+def generate_links(esim_number, country, gb_amount, is_files=True):
     """Генерация ссылок с QR-кодами."""
     # Создаем список eSIM
     esim_list = [{"id": str(uuid.uuid4()), "country": country, "gb_amount": gb_amount} for _ in range(esim_number)]
@@ -42,14 +42,16 @@ def generate_links(esim_number, country, gb_amount):
     output_dir = "qr_codes"
 
     # Генерация QR-кодов и сохранение
-    for esim in esim_list:
-        qr_code_url = f"https://esimunity.ru/{esim['country']}/{gb_amount}/{esim['id']}"
-        file_path = os.path.join(f"{output_dir}/{country}/{gb_amount}", f"{esim['country']}_{gb_amount}_{esim['id']}.png")  # Уникальное имя файла
-        generate_qr_code(qr_code_url, save_path=file_path)  # Сохраняем QR-код в файл
-
-    # Сохраняем eSIM в базе данных
-    db_insert_esims(esim_list)
+    if is_files:
+        for esim in esim_list:
+            qr_code_url = f"https://esimunity.ru/{esim['country']}/{gb_amount}/{esim['id']}"
+            file_path = os.path.join(f"{output_dir}/{country}/{gb_amount}", f"{esim['country']}_{gb_amount}_{esim['id']}.png")  # Уникальное имя файла
+            generate_qr_code(qr_code_url, save_path=file_path)  # Сохраняем QR-код в файл
+            db_insert_esims(esim_list)
+    else:
+        db_insert_esims(esim_list)
+        return [f"https://esimunity.ru/{esim['country']}/{esim['id']}" for esim in esim_list]
 
 
 # Генерация одного eSIM для Турции с объемом 3 ГБ
-generate_links(25, "turkey", 20)
+# generate_links(25, "turkey", 20)

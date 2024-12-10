@@ -1,14 +1,11 @@
 from datetime import datetime
 import requests
-from flask import Flask, render_template
+from quart import Quart, request, render_template
 import base64
 import redis
 import logging
 import os
-import asyncio
 
-from asgiref.sync import async_to_sync
-from flask import request
 from logging.handlers import RotatingFileHandler
 from bnesim_api import BnesimApi
 from config import Config
@@ -18,8 +15,8 @@ from link_for_marketplace.db_link import db_get_esim_data, db_switch_status_on_a
     db_get_link_status, db_fill_date
 from robokassa_api import handle_payment
 
-# Инициализация Flask и Redis
-app = Flask(__name__, static_folder='static')
+# Инициализация Quart и Redis
+app = Quart(__name__, static_folder='static')
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
 CACHE_TTL = 120  # TTL для кэширования в секундах
@@ -42,15 +39,12 @@ logger = logging.getLogger()
 logger.setLevel(logging.ERROR)  # Логируем только ERROR и выше
 logger.addHandler(file_handler)
 
-# Отключение логов Flask сервера в консоль
-logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
-
-def generate_qr_code(data_url):
+async def generate_qr_code(data_url):
     """Загрузка QR-кода по URL и конвертация в base64"""
-    response = requests.get(data_url)
-    response.raise_for_status()  # Обработка ошибок загрузки
-    return base64.b64encode(response.content).decode("utf-8")
+    async with requests.get(data_url) as response:
+        response.raise_for_status()  # Обработка ошибок загрузки
+        return base64.b64encode(await response.content).decode("utf-8")
 
 
 def get_country_info(country):
@@ -65,9 +59,9 @@ def cache_page(key, ttl, page_content):
     redis_client.setex(key, ttl, page_content)
 
 
-def render_esim_page(country, gb_amount, ios_link, qr_code, instructions_link):
+async def render_esim_page(country, gb_amount, ios_link, qr_code, instructions_link):
     """Рендеринг страницы eSIM"""
-    return render_template(
+    return await render_template(
         'welcome.html',
         country=country,
         gb_amount=gb_amount,
@@ -77,33 +71,30 @@ def render_esim_page(country, gb_amount, ios_link, qr_code, instructions_link):
     )
 
 
-def render_expired_page():
+async def render_expired_page():
     """Рендеринг страницы истечения срока действия eSIM"""
-    return render_template(
+    return await render_template(
         'expired_date_page.html',
         direct_bot_link=Config.BOT_LINK,
     )
 
 
-def render_error_page():
+async def render_error_page():
     """Рендеринг страницы с ошибкой"""
-    return render_template(
+    return await render_template(
         'error_page.html',
     )
 
 
 @app.route('/payment-result', methods=['GET', 'POST'])
-def payment_result():
+async def payment_result():
     try:
         print("Request received:", request.method)
-        print("Request data (form):", request.form)
+        print("Request data (form):", await request.form)  # Асинхронное получение данных
 
         if request.method == 'POST':
-            # Конвертируем данные POST-запроса из request.form
-            post_data = request.form.to_dict()
-
-            # Вызываем асинхронный метод через async_to_sync
-            async_to_sync(handle_payment)(post_data)
+            post_data = await request.form
+            await handle_payment(post_data)  # Нативно вызываем асинхронный метод
 
         return "OK", 200
     except Exception as e:
@@ -112,7 +103,7 @@ def payment_result():
 
 
 @app.route('/<country>/<gb_amount>/<uuid>')
-def welcome_page(country: str, gb_amount: str, uuid: str):
+async def welcome_page(country: str, gb_amount: str, uuid: str):
     cache_key = f"esim:{country}:{gb_amount}:{uuid}"
 
     # Проверка кэша
@@ -127,7 +118,7 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
 
         data = db_get_esim_data(uuid)
         if (datetime.now() - data[0]).days >= 30:
-            return render_expired_page()
+            return await render_expired_page()
 
         country_info = get_country_info(country)
         instructions_link = Config.QUESTIONS_LINK
@@ -141,23 +132,23 @@ def welcome_page(country: str, gb_amount: str, uuid: str):
 
             gb_amount_display = f"{gb_amount}.0"
             ios_link = active_esim["ios_universal_installation_link"]
-            qr_code = generate_qr_code(active_esim["qr_code_url"])
+            qr_code = await generate_qr_code(active_esim["qr_code_url"])
         else:
             iccid = db_get_iccid(uuid)
             esim_info = bnesim.get_esim_info(iccid)
 
             gb_amount_display = esim_info["remaining_data"]
             ios_link = esim_info["ios_link"]
-            qr_code = generate_qr_code(esim_info["qr_code_url"])
+            qr_code = await generate_qr_code(esim_info["qr_code_url"])
 
-        rendered_page = render_esim_page(country_info, gb_amount_display, ios_link, qr_code, instructions_link)
+        rendered_page = await render_esim_page(country_info, gb_amount_display, ios_link, qr_code, instructions_link)
         cache_page(cache_key, CACHE_TTL, rendered_page)
         return rendered_page
 
     except Exception as e:
         # Логируем только ошибки
         logger.error(f"{uuid} : {str(e)}\n", exc_info=True)
-        return render_error_page(), 500
+        return await render_error_page(), 500
 
 
 if __name__ == '__main__':

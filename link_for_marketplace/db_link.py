@@ -28,7 +28,6 @@ def db_get_link_status(esim_id):
         "SELECT status FROM links WHERE id=%s",
         (esim_id,),
     )
-    print(result[0][0])
     return result[0][0] if result else None
 
 
