@@ -3,6 +3,7 @@ import decimal
 import hashlib
 from urllib import parse
 
+from async_bnesim_api import AsyncBnesimApi
 from bnesim_api import BnesimApi
 from config import Config
 from db.users.db_cli import db_get_cli
@@ -42,7 +43,7 @@ def generate_payment_link(
     return f'{robokassa_payment_url}?{parse.urlencode(data)}'
 
 
-async def handle_payment(data):
+def handle_payment(data):
     from core.helpful_methods import handle_payment_order, handle_first_payment_order
 
     out_summ = data.get('OutSum')
@@ -53,18 +54,16 @@ async def handle_payment(data):
 
     chat_id = db_get_chat_id_by_invoice_id(invoice_id)
     if signature.lower() == expected_signature.lower():
-        bnesim = BnesimApi()
+        bnesim = BnesimApi()  # Синхронный вызов API
         cli = db_get_cli(chat_id)
         data_default = db_get_all_data(chat_id)
         top_up_data = db_get_all_top_up_data(chat_id)
-        downloading_message = await Config.BOT.send_message(chat_id, "*🚀 Подождите, обрабатываю данные платежа...*")
-        await asyncio.sleep(5)
-        iccids_list = await bnesim.get_iccids_of_user(cli)
+        iccids_list = bnesim.get_iccids_of_user(cli)
         top_up_flag = db_get_top_up_flag(chat_id)
         username = db_get_username_by_invoice_id(invoice_id)
         if cli is None:
-            cli = await bnesim.activate_user(f"{username}_{chat_id}")
-            await handle_first_payment_order(cli, chat_id, data_default, bnesim, downloading_message)
+            cli = bnesim.activate_user(f"{username}_{chat_id}")
+            handle_first_payment_order(cli, chat_id, data_default, bnesim)
         else:
-            await handle_payment_order(cli, bnesim, data_default, top_up_data,
-                                       top_up_flag, chat_id, downloading_message, iccids_list)
+            handle_payment_order(cli, bnesim, data_default, top_up_data,
+                                 top_up_flag, chat_id, iccids_list)

@@ -3,6 +3,7 @@ import asyncio
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from async_bnesim_api import AsyncBnesimApi
 from bnesim_api import BnesimApi
 from config import Config
 from db.users.db_cli import db_get_all_cli
@@ -15,12 +16,12 @@ users_list = db_get_all_cli()
 async def send_remaining_info():
     for user in users_list:
         hidden_esims = db_get_hidden_esims(user[0])
-        iccids_dict = await bnesim_api.get_iccids_of_user(user[1])
+        iccids_dict = bnesim_api.get_iccids_of_user(user[1])
         if iccids_dict["length"] > 0:
             for iccid in iccids_dict["iccids"]:
                 if hidden_esims is not None and iccid in hidden_esims["esims"]:
                     continue
-                esim_info = await bnesim_api.get_esim_info(iccid)
+                esim_info = bnesim_api.get_esim_info(iccid)
                 if esim_info is not None and esim_info['remaining_data'] <= 1.0:
                     kb = InlineKeyboardBuilder().add(
                         InlineKeyboardButton(text="Продлить интернет", callback_data="top_up_choose_payment_method_"),

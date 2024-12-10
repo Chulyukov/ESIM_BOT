@@ -11,7 +11,7 @@ class Config:
     # Токен тестового телеграм-бота t.me/vdghasda_bot
     TEST_TOKEN = "8101981246:AAGwNiazPZliWFFMItehFeFO8HCQ0fgIUJA"
     # Сущность бота
-    BOT = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
     # Полная ссылка на бота
     BOT_LINK = "https://t.me/esim_unity_bot"
     # Тестовый токен YOKASSA

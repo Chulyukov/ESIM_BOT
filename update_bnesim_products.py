@@ -4,6 +4,7 @@ from datetime import datetime
 
 from aiogram.types import FSInputFile  # Импортируем класс FSInputFile для отправки файла
 
+from async_bnesim_api import AsyncBnesimApi
 from bnesim_api import BnesimApi
 from config import Config
 from db.db_bnesim_products import db_get_bnesim_products
@@ -12,7 +13,7 @@ from db.db_bnesim_products import db_get_bnesim_products
 async def update_products():
     bnesim = BnesimApi()
     old_data = db_get_bnesim_products()  # Старые данные из базы
-    new_data = await bnesim.get_products_catalog()  # Новые данные из API
+    new_data = bnesim.get_products_catalog()  # Новые данные из API
     result_text = "Проверка update_bnesim_products была произведена успешно.\n\n"
 
     # 1. Преобразуем данные в формат с ключом по (Country, Volume) для лучшего сравнения

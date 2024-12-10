@@ -3,7 +3,7 @@ from aiogram.enums import ContentType
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton
 
-from bnesim_api import BnesimApi
+from async_bnesim_api import AsyncBnesimApi
 from config import Config
 from core.helpful_methods import get_username, get_plan_prices, build_keyboard, prepare_payment_order, \
     handle_payment_order, handle_first_payment_order, choose_direction

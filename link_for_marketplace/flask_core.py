@@ -5,9 +5,11 @@ import redis
 import logging
 import os
 import httpx
+import asyncio
 
+from concurrent.futures import ThreadPoolExecutor
 from logging.handlers import RotatingFileHandler
-from bnesim_api import BnesimApi
+from async_bnesim_api import AsyncBnesimApi
 from config import Config
 from db.db_bnesim_products import db_get_product_id
 from db.db_buy_esim import db_get_emoji_from_two_tables, db_get_ru_name_from_two_tables
@@ -87,15 +89,20 @@ async def render_error_page():
     )
 
 
-@app.route('/payment-result', methods=['GET', 'POST'])
+@app.route('/payment-result', methods=['POST'])
 async def payment_result():
     try:
-        print("Request received:", request.method)
-        print("Request data (form):", await request.form)  # Асинхронное получение данных
+        # Получаем данные из запроса
+        post_data = await request.form
 
-        if request.method == 'POST':
-            post_data = await request.form
-            await handle_payment(post_data)  # Нативно вызываем асинхронный метод
+        # Вызываем синхронный метод в асинхронном контексте
+        loop = asyncio.get_event_loop()
+        with ThreadPoolExecutor() as executor:
+            result = await loop.run_in_executor(
+                executor,
+                handle_payment,  # Ваш синхронный метод
+                post_data             # Аргументы для метода
+            )
 
         return "OK", 200
     except Exception as e:
@@ -123,7 +130,7 @@ async def welcome_page(country: str, gb_amount: str, uuid: str):
 
         country_info = get_country_info(country)
         instructions_link = Config.QUESTIONS_LINK
-        bnesim = BnesimApi()
+        bnesim = AsyncBnesimApi()
 
         if data[1] == "unactivated":
             db_switch_status_on_activated(uuid)

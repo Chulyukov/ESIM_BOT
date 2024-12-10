@@ -5,6 +5,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, BufferedInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from async_bnesim_api import AsyncBnesimApi
 from bnesim_api import BnesimApi
 from config import Config
 from core.helpful_methods import get_plan_prices, prepare_payment_order
@@ -22,7 +23,7 @@ async def get_my_esims(message: Message):
     cli = db_get_cli(chat_id)
 
     downloading_message = await message.answer("*🚀 Подождите, загружаю данные...*")
-    iccids_map = await bnesim.get_iccids_of_user(cli)
+    iccids_map = bnesim.get_iccids_of_user(cli)
 
     while iccids_map is None:
         await asyncio.sleep(1)
@@ -42,8 +43,9 @@ async def get_my_esims(message: Message):
         for iccid in iccids_map.get("iccids", []):
             if hidden_esims is not None and iccid in hidden_esims["esims"]:
                 continue
-            esim_info = await bnesim.get_esim_info(iccid)
+            esim_info = bnesim.get_esim_info(iccid)
             if esim_info is not None:
+                print(esim_info)
                 kb.add(InlineKeyboardButton(text=f"{esim_info["country"]} - {iccid[-4:]}",
                                             callback_data=f"get_esim_info_{iccid}"))
         kb = kb.adjust(1).as_markup()
@@ -57,7 +59,7 @@ async def get_my_esims(message: Message):
 
 @router.callback_query(F.data.startswith("get_esim_info_"))
 async def get_esim_info(callback: CallbackQuery):
-    bnesim = BnesimApi()
+    bnesim = AsyncBnesimApi()
     iccid = callback.data.split("_")[-1]
     esim_info = await bnesim.get_esim_info(iccid)
 
