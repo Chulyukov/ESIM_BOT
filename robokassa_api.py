@@ -1,4 +1,3 @@
-import asyncio
 import decimal
 import hashlib
 from urllib import parse
@@ -11,7 +10,11 @@ from db.db_queries import (
     db_get_chat_id_by_invoice_id,
     db_get_all_top_up_data,
     db_get_top_up_flag,
-    db_get_username_by_invoice_id
+    db_get_username_by_invoice_id,
+    db_update_cli,
+    db_clean_data,
+    db_clean_top_up_data,
+    db_get_product_id
 )
 
 
@@ -39,21 +42,8 @@ def generate_payment_link(
 ) -> str:
     """
     Генерирует ссылку на оплату в системе Robokassa.
-
-    Args:
-        merchant_login (str): Логин мерчанта.
-        merchant_password_1 (str): Пароль для подписи.
-        cost (decimal.Decimal): Сумма оплаты.
-        number (int): Номер заказа.
-        description (str): Описание заказа.
-        is_test (int): Флаг тестового режима (0 - реальный, 1 - тестовый).
-        robokassa_payment_url (str): URL Robokassa.
-
-    Returns:
-        str: Ссылка на оплату.
     """
     signature = calculate_signature(merchant_login, cost, number, merchant_password_1)
-
     data = {
         'MerchantLogin': merchant_login,
         'OutSum': cost,
@@ -78,7 +68,6 @@ def handle_payment(data: dict):
 
     # Проверяем корректность подписи
     expected_signature = calculate_signature(out_summ, invoice_id, Config.PASSWORD2)
-
     if signature.lower() != expected_signature.lower():
         raise ValueError("Подпись не совпадает, обработка платежа прервана.")
 
@@ -100,18 +89,7 @@ def handle_payment(data: dict):
         handle_payment_order(cli, bnesim, data_default, top_up_data, top_up_flag, chat_id, iccids_list)
 
 
-from bnesim_api import BnesimApi
-from config import Config
-from db.db_queries import (
-    db_update_cli,
-    db_clean_data,
-    db_clean_top_up_data,
-    db_get_product_id
-)
-from aiogram.types import BufferedInputFile
-
-
-async def handle_first_payment_order(cli, chat_id, data, bnesim):
+def handle_first_payment_order(cli, chat_id, data, bnesim):
     """
     Обрабатывает первый платеж и активирует eSIM.
 
@@ -126,14 +104,16 @@ async def handle_first_payment_order(cli, chat_id, data, bnesim):
     active_esim = bnesim.activate_esim(cli, product_id)
     esim_info = bnesim.get_esim_info(active_esim["iccid"])
 
+    # Ожидание данных eSIM
     while cli is None or active_esim["qr_code"] is None:
-        await asyncio.sleep(1)
+        pass  # Заменяем await asyncio.sleep(1) на блокирующий цикл ожидания
 
     db_clean_data(chat_id)
 
-    await Config.BOT.send_photo(
+    # Отправляем сообщение
+    Config.BOT.send_photo(
         chat_id=chat_id,
-        photo=BufferedInputFile(active_esim["qr_code"], "png_qr_code.png"),
+        photo=active_esim["qr_code"],
         caption=(
             "*🎊 Поздравляем с приобретением вашей первой eSIM!*"
             f"\n\n📛 *Название вашей eSIM:* `{data['country'].title()} - {active_esim['iccid'][-4:]}`"
@@ -147,18 +127,9 @@ async def handle_first_payment_order(cli, chat_id, data, bnesim):
     )
 
 
-async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag, chat_id, iccids_list):
+def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag, chat_id, iccids_list):
     """
     Обрабатывает продление или активацию eSIM.
-
-    Args:
-        cli (str): CLI пользователя.
-        bnesim (BnesimApi): Экземпляр API BNESIM.
-        data (dict): Данные пользователя.
-        top_up_data (dict): Данные для пополнения.
-        top_up_flag (bool): Флаг пополнения.
-        chat_id (str): ID чата.
-        iccids_list (list): Список ICCID.
     """
     if top_up_data and len(top_up_data) == 3 and top_up_data["iccid"] in iccids_list["iccids"] and top_up_flag:
         product_id = db_get_product_id(top_up_data["country"], top_up_data["volume"])
@@ -166,10 +137,11 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag, chat
 
         db_clean_top_up_data(chat_id)
 
+        # Ожидание ответа API
         while api_response is None:
-            await asyncio.sleep(1)
+            pass
 
-        await Config.BOT.send_message(
+        Config.BOT.send_message(
             chat_id=chat_id,
             text=(
                 "*🎊 Успешное продление eSIM!*"
@@ -182,14 +154,15 @@ async def handle_payment_order(cli, bnesim, data, top_up_data, top_up_flag, chat
         active_esim = bnesim.activate_esim(cli, product_id)
         esim_info = bnesim.get_esim_info(active_esim["iccid"])
 
+        # Ожидание данных eSIM
         while active_esim["qr_code"] is None:
-            await asyncio.sleep(1)
+            pass
 
         db_clean_data(chat_id)
 
-        await Config.BOT.send_photo(
+        Config.BOT.send_photo(
             chat_id=chat_id,
-            photo=BufferedInputFile(active_esim["qr_code"], "png_qr_code.png"),
+            photo=active_esim["qr_code"],
             caption=(
                 "*🎊 Спасибо за приобретение новой eSIM!*"
                 f"\n\n📛 *Название вашей eSIM:* `{data['country'].title()} - {active_esim['iccid'][-4:]}`"

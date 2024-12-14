@@ -12,7 +12,7 @@ class Config:
     TEST_TOKEN: str = "8101981246:AAGwNiazPZliWFFMItehFeFO8HCQ0fgIUJA"
 
     # Создание объекта бота
-    BOT: Bot = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT: Bot = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
 
     # Ссылки на бота
     BOT_LINK: str = "https://t.me/esim_unity_bot"
