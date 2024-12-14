@@ -10,23 +10,19 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.ERROR)
 
 
-@app.route('/payment-result')
-def home():
-    return "Приложение Flask работает через Gunicorn и Nginx!"
+@app.route('/payment-result', methods=['POST'])
+def payment_result():
+    try:
+        # Получаем данные из запроса
+        post_data = request.form.to_dict()
 
-# @app.route('/payment-result', methods=['POST'])
-# def payment_result():
-#     try:
-#         # Получаем данные из запроса
-#         post_data = request.form.to_dict()
-#
-#         # Вызываем синхронный метод напрямую
-#         handle_payment(post_data)
-#
-#         return "OK", 200
-#     except Exception as e:
-#         logger.error(f"Error in /payment-result: {e}", exc_info=True)
-#         return "Internal Server Error", 500
+        # Вызываем синхронный метод напрямую
+        handle_payment(post_data)
+
+        return "OK", 200
+    except Exception as e:
+        logger.error(f"Error in /payment-result: {e}", exc_info=True)
+        return "Internal Server Error", 500
 
 
 if __name__ == '__main__':
