@@ -24,6 +24,11 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 
+@app.route('/')
+def home():
+    return "Приложение работает!!!"
+
+
 @app.route('/payment-result', methods=['POST'])
 def payment_result():
     try:
