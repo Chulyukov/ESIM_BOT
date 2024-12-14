@@ -1,4 +1,7 @@
 from flask import Flask, request
+from logging.handlers import RotatingFileHandler
+
+import logging
 import logging
 
 from robokassa_api import handle_payment  # Ваш метод обработки платежей
@@ -7,7 +10,18 @@ app = Flask(__name__)
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.ERROR)
+logger.setLevel(logging.ERROR)
+
+# Обработчик для записи логов в файл
+file_handler = RotatingFileHandler('app.log', maxBytes=10 * 1024 * 1024, backupCount=5)
+file_handler.setLevel(logging.ERROR)
+
+# Формат логов
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# Добавляем обработчик в логгер
+logger.addHandler(file_handler)
 
 
 @app.route('/payment-result', methods=['POST'])
