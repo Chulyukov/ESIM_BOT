@@ -1,9 +1,8 @@
-import asyncio
 import random
 from datetime import datetime
 
 from aiogram import types
-from aiogram.types import CallbackQuery, InlineKeyboardButton, Message, BufferedInputFile
+from aiogram.types import CallbackQuery, InlineKeyboardButton, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import Config
@@ -11,8 +10,7 @@ from db.db_queries import (
     db_get_top_up_data_country, db_get_data_country, db_get_price_data,
     db_update_top_up_flag_true, db_update_top_up_data_volume,
     db_update_top_up_flag_false, db_update_data_volume, db_get_emoji_from_two_tables,
-    db_get_ru_name_from_two_tables, db_get_pay_pic_link, db_save_invoice_user,
-    db_get_username, db_get_product_id, db_update_cli, db_clean_data, db_clean_top_up_data
+    db_get_ru_name_from_two_tables, db_get_pay_pic_link, db_save_invoice_user
 )
 from get_euro_rate import get_euro_to_rub_rate
 from robokassa_api import generate_payment_link
@@ -120,7 +118,6 @@ async def create_payment_link(callback, chat_id, emoji, ru_name, gb_amount, amou
                                                      f"username: {username}\n"
                                                      f"amount: {str(amount)}\n"
                                                      f"country: {emoji}{country}\n"
-                                                     f"invoice_id: {str(invoice_id)}\n"
                                                      f"payment_link: {payment_link}\n")
 
     if photo_url:
