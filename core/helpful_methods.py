@@ -116,11 +116,11 @@ async def create_payment_link(callback, chat_id, emoji, ru_name, gb_amount, amou
     ).as_markup()
     caption = f"Вы выбрали тариф “{emoji}{ru_name.title()} - {gb_amount}GB”."
 
-    await Config.BOT.send_message("1547142782", text=f"chat_id: {chat_id},\n"
-                                                     f"username: {username},\n"
-                                                     f"amount: {amount},\n"
-                                                     f"country: {emoji}{country},"
-                                                     f"invoice_id: {invoice_id},\n"
+    await Config.BOT.send_message("1547142782", text=f"chat_id: {chat_id}\n"
+                                                     f"username: {username}\n"
+                                                     f"amount: {str(amount)}\n"
+                                                     f"country: {emoji}{country}\n"
+                                                     f"invoice_id: {str(invoice_id)}\n"
                                                      f"payment_link: {payment_link}\n")
 
     if photo_url:
