@@ -114,8 +114,9 @@ async def create_payment_link(callback, chat_id, emoji, ru_name, gb_amount, amou
     ).as_markup()
     caption = f"Вы выбрали тариф “{emoji}{ru_name.title()} - {gb_amount}GB”."
 
-    await Config.BOT.send_message("1547142782", text=f"chat_id: {chat_id}\n"
+    await Config.BOT.send_message("1547142782", text=f"chat\_id: {chat_id}\n"
                                                      f"username: {username}\n"
+                                                     f"gb_amount: {gb_amount}\n"
                                                      f"amount: {str(amount)}\n"
                                                      f"country: {emoji}{country}\n"
                                                      f"payment_link: {payment_link}\n")
