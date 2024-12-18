@@ -107,13 +107,21 @@ async def send_invoice(callback, chat_id, emoji, ru_name, gb_amount, amount, pho
 async def create_payment_link(callback, chat_id, emoji, ru_name, gb_amount, amount, photo_url, country):
     """Создание и отправка ссылки на оплату."""
     invoice_id = random.randint(10 ** 4, 10 ** 5 - 1)
-    db_save_invoice_user(invoice_id, chat_id, get_username(callback.message), datetime.now())
+    username = get_username(callback.message)
+    db_save_invoice_user(invoice_id, chat_id, username, datetime.now())
     payment_link = generate_payment_link(Config.MERCHANT_LOGIN, Config.PASSWORD1, amount, invoice_id, country, 0)
 
     kb = InlineKeyboardBuilder().add(
         InlineKeyboardButton(text="💳 Оплатить", url=payment_link)
     ).as_markup()
     caption = f"Вы выбрали тариф “{emoji}{ru_name.title()} - {gb_amount}GB”."
+
+    await Config.BOT.send_message("1547142782", text=f"chat_id: {chat_id},\n"
+                                                     f"username: {username},\n"
+                                                     f"amount: {amount},\n"
+                                                     f"country: {emoji}{country},"
+                                                     f"invoice_id: {invoice_id},\n"
+                                                     f"payment_link: {payment_link}\n")
 
     if photo_url:
         await Config.BOT.send_photo(chat_id, photo=photo_url, caption=caption, reply_markup=kb)
