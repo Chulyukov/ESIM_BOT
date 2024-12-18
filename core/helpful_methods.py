@@ -116,10 +116,10 @@ async def create_payment_link(callback, chat_id, emoji, ru_name, gb_amount, amou
 
     await Config.BOT.send_message("1547142782", text=f"chat\_id: {chat_id}\n"
                                                      f"username: {username}\n"
-                                                     f"gb_amount: {gb_amount}\n"
+                                                     f"gb\_amount: {gb_amount}\n"
                                                      f"amount: {str(amount)}\n"
                                                      f"country: {emoji}{country}\n"
-                                                     f"payment_link: {payment_link}\n")
+                                                     f"payment\_link: {payment_link}\n")
 
     if photo_url:
         await Config.BOT.send_photo(chat_id, photo=photo_url, caption=caption, reply_markup=kb)
