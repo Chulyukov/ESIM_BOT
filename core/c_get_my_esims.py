@@ -6,8 +6,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bnesim_api import BnesimApi
 from config import Config
-from core.helpful_methods import get_plan_prices, prepare_payment_order
+from core.helpful_methods import get_bundle_price_list, prepare_payment_order
 from db.db_queries import db_get_cli, db_get_hidden_esims, db_update_top_up_data_iccid_and_country
+from monty_api import MontyApi
 
 router = Router()
 
@@ -28,48 +29,46 @@ INSTALLATION_GUIDE = (
 
 @router.message(Command("get_my_esims"))
 async def get_my_esims(message: Message):
+    # downloading_message = await message.answer("*🚀 Подождите, загружаю данные...*")
     chat_id = message.chat.id
-    bnesim = BnesimApi()
-    cli = db_get_cli(chat_id)
-    downloading_message = await message.answer("*🚀 Подождите, загружаю данные...*")
+    monty = MontyApi()
 
-    iccids_map = bnesim.get_iccids_of_user(cli)
-    while iccids_map is None:
-        await asyncio.sleep(1)
+    # while iccids_map is None:
+    #     await asyncio.sleep(1)
+    #
+    # if iccids_map["length"] == 0:
+    kb = InlineKeyboardBuilder().add(
+        InlineKeyboardButton(text="Приобрести eSIM", callback_data="buy_esim")
+    ).as_markup()
 
-    if iccids_map["length"] == 0:
-        kb = InlineKeyboardBuilder().add(
-            InlineKeyboardButton(text="Приобрести eSIM", callback_data="buy_esim")
-        ).as_markup()
-
-        await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
-        await message.answer(
-            text="*💔 Мы не нашли у вас ни одной eSIM, но вы можете приобрести их, нажав кнопку ниже.*",
-            reply_markup=kb,
-        )
-    else:
-        hidden_esims = db_get_hidden_esims(chat_id)
-        kb = InlineKeyboardBuilder()
-        for iccid in iccids_map.get("iccids", []):
-            if hidden_esims and iccid in hidden_esims["esims"]:
-                continue
-
-            esim_info = bnesim.get_esim_info(iccid)
-            if esim_info:
-                kb.add(InlineKeyboardButton(
-                    text=f"{esim_info['country']} - {iccid[-4:]}",
-                    callback_data=f"get_esim_info_{iccid}"
-                ))
-
-        kb = kb.adjust(1).as_markup()
-        await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
-        await message.answer(
-            text=(
-                "*👇 Выберите одну из ваших eSIM, чтобы узнать подробную информацию о ней "
-                "или продлить пакет интернета.*"
-            ),
-            reply_markup=kb,
-        )
+    # await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
+    await message.answer(
+        text="*💔 Мы не нашли у вас ни одной eSIM, но вы можете приобрести их, нажав кнопку ниже.*",
+        reply_markup=kb,
+    )
+    # else:
+    #     hidden_esims = db_get_hidden_esims(chat_id)
+    #     kb = InlineKeyboardBuilder()
+    #     for iccid in iccids_map.get("iccids", []):
+    #         if hidden_esims and iccid in hidden_esims["esims"]:
+    #             continue
+    #
+    #         esim_info = bnesim.get_esim_info(iccid)
+    #         if esim_info:
+    #             kb.add(InlineKeyboardButton(
+    #                 text=f"{esim_info['country']} - {iccid[-4:]}",
+    #                 callback_data=f"get_esim_info_{iccid}"
+    #             ))
+    #
+    #     kb = kb.adjust(1).as_markup()
+    #     await Config.BOT.delete_message(chat_id=chat_id, message_id=downloading_message.message_id)
+    #     await message.answer(
+    #         text=(
+    #             "*👇 Выберите одну из ваших eSIM, чтобы узнать подробную информацию о ней "
+    #             "или продлить пакет интернета.*"
+    #         ),
+    #         reply_markup=kb,
+    #     )
 
 
 @router.callback_query(F.data.startswith("get_esim_info_"))
@@ -100,7 +99,7 @@ async def get_esim_info(callback: CallbackQuery):
 
 @router.callback_query(F.data == "top_up_choose_plan_rub")
 async def top_up_choose_plan_russian(callback: CallbackQuery):
-    prices = get_plan_prices("RUB", callback.message.chat.id, True)
+    prices = get_bundle_price_list("RUB", callback.message.chat.id, True)
     kb = InlineKeyboardBuilder().add(
         *[
             InlineKeyboardButton(

@@ -2,7 +2,6 @@ from flask import Flask, request
 from logging.handlers import RotatingFileHandler
 
 import logging
-import logging
 
 from robokassa_api import handle_payment  # Ваш метод обработки платежей
 

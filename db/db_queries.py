@@ -19,28 +19,20 @@ def db_add_user(chat_id, username, activation_datetime):
                   (chat_id, username, activation_datetime,))
 
 
-def db_get_emoji_from_two_tables(country):
+def db_get_emoji(country):
     """Получаем emoji из одной таблицы (либо countries, либо regions: зависит от того, где присутствует направление)"""
     result = execute_query("Ошибка при получении emoji",
                            "SELECT emoji FROM countries WHERE name = %s",
                            (country,))
-    if not result:
-        result = execute_query("Ошибка при получении emoji",
-                               "SELECT emoji FROM regions WHERE name = %s",
-                               (country,))
     return result[0][0] if result else None
 
 
-def db_get_ru_name_from_two_tables(country):
+def db_get_ru_name(country):
     """Получаем ru_name из одной таблицы
     (либо countries, либо regions: зависит от того, где присутствует направление)"""
     result = execute_query("Ошибка при получении emoji",
                            "SELECT ru_name FROM countries WHERE name = %s",
                            (country,))
-    if not result:
-        result = execute_query("Ошибка при получении emoji",
-                               "SELECT ru_name FROM regions WHERE name = %s",
-                               (country,))
     return result[0][0] if result else None
 
 
@@ -352,4 +344,19 @@ def db_get_pay_pic_link(name):
     result = execute_query("Ошибка при получении pay_pic_link",
                            "SELECT pay_pic_link FROM countries WHERE name = %s",
                            (name,))
+    return result[0][0] if result else None
+
+
+def db_insert_monty_countries(country, iso3_code):
+    """Добавлям iso3_code и country"""
+    execute_query("Ошибка при добавлении iso3_code и country",
+                  "INSERT INTO monty_countries (country, iso3_code) VALUES (%s, %s)",
+                  (country, iso3_code,))
+
+
+def db_get_iso3_code(country):
+    """Получаем iso3_code"""
+    result = execute_query("Ошибка при получении iso3_code",
+                           "SELECT iso3_code FROM monty_countries WHERE country = %s",
+                           (country,))
     return result[0][0] if result else None

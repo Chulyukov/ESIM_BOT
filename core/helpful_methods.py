@@ -9,40 +9,17 @@ from config import Config
 from db.db_queries import (
     db_get_top_up_data_country, db_get_data_country, db_get_price_data,
     db_update_top_up_flag_true, db_update_top_up_data_volume,
-    db_update_top_up_flag_false, db_update_data_volume, db_get_emoji_from_two_tables,
-    db_get_ru_name_from_two_tables, db_get_pay_pic_link, db_save_invoice_user
+    db_update_top_up_flag_false, db_update_data_volume, db_get_emoji,
+    db_get_ru_name, db_get_pay_pic_link, db_save_invoice_user
 )
-from get_euro_rate import get_euro_to_rub_rate
+from currency_rate import get_dollar_to_rub_rate
+from monty_api import MontyApi
 from robokassa_api import generate_payment_link
 
 
 def get_username(message):
     """Получение имени пользователя."""
     return f"@{message.from_user.username}" if message.from_user.username else message.from_user.first_name
-
-
-async def choose_direction(msg: Message | CallbackQuery):
-    """Отображение выбора направлений."""
-    message_text = (
-        "🚨 *Перед тем, как выбрать направление, "
-        "удостоверьтесь, что ваш смартфон поддерживает eSIM.* "
-        "[Инструкция](https://telegra.ph/Kak-ponyat-chto-u-menya-est-vozmozhnost-podklyuchit-eSIM-07-27).\n\n"
-        "🔍 Вы можете в любое время ввести название страны, и бот покажет все подходящие варианты.\n\n"
-        "🆘 Если у вас возникли сложности, свяжитесь со "
-        "[службой заботы клиента](https://t.me/esim_unity_support).\n\n"
-        "👇 *Выберите раздел.*"
-    )
-    kb = build_keyboard([
-        InlineKeyboardButton(text="🔥 Популярные направления", callback_data="popular_directions"),
-        InlineKeyboardButton(text="📍 Отдельные страны", callback_data="countries_0"),
-        InlineKeyboardButton(text="🗺️ Регионы", callback_data="regions"),
-        InlineKeyboardButton(text="🌎 Весь мир", callback_data="choose_plan_rub_global"),
-    ], (1,))
-
-    if isinstance(msg, CallbackQuery):
-        await msg.message.edit_text(text=message_text, reply_markup=kb, disable_web_page_preview=True)
-    else:
-        await msg.answer(text=message_text, reply_markup=kb, disable_web_page_preview=True)
 
 
 def build_keyboard(buttons, layout):
@@ -52,15 +29,43 @@ def build_keyboard(buttons, layout):
     return kb.adjust(*layout).as_markup()
 
 
-def get_plan_prices(currency, chat_id, is_top_up=False):
-    """Получение цен для тарифов."""
-    country = db_get_top_up_data_country(chat_id) if is_top_up else db_get_data_country(chat_id)
-    price_data = db_get_price_data(country)
-    multiplier = get_euro_to_rub_rate() if currency == 'RUB' else get_euro_to_rub_rate() / 1.5
-    return {
-        plan: int(float(price_data[plan]["price"]) * multiplier * 1.04 * 1.06 * 1.2 * 1.2 * 1.3)
-        for plan in [3, 5, 10, 20]
-    }
+def get_bundle_price_list(country):
+    """Получение цен для тарифов по стране."""
+    multiplier = get_dollar_to_rub_rate()
+    processed_bundle_data = {}
+
+    monty = MontyApi()
+    bundle_data = monty.get_bundle_data(country)
+
+    for gb_amount in [3, 5, 10, 20]:
+        bundle_price = 10000
+        subscriber_price = ""
+        bundle_code = ""
+        for bundle in bundle_data:
+            if ((f"{gb_amount}GB" in bundle["bundle_name"] or
+                 f"{float(gb_amount) * 1024}MB" in bundle["bundle_name"]) and bundle_price > bundle["subscriber_price"]) and bundle["validity"] == 30:
+                bundle_price = bundle["subscriber_price"]
+                subscriber_price = bundle["subscriber_price"]
+        if subscriber_price:
+            processed_bundle_data[str(gb_amount)] = float(subscriber_price) * multiplier * 1.04 * 1.06 * 1.2 * 1.2 * 1.4
+
+    return processed_bundle_data
+
+
+def get_bundle_code(country, gb_amount):
+    """Получение bundle_code по стране, количеству ГБ."""
+    monty = MontyApi()
+    bundle_data = monty.get_bundle_data(country)
+
+    bundle_price = 10000
+    bundle_code = ""
+    for bundle in bundle_data:
+        if ((f"{gb_amount}GB" in bundle["bundle_name"] or
+             f"{float(gb_amount) * 1024}MB" in bundle["bundle_name"]) and bundle_price > bundle["subscriber_price"]) and bundle["validity"] == 30:
+            bundle_price = bundle["subscriber_price"]
+            bundle_code = bundle["bundle_code"]
+
+    return bundle_code
 
 
 async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=False):
@@ -76,9 +81,9 @@ async def prepare_payment_order(callback: CallbackQuery, currency, is_top_up=Fal
         db_update_top_up_flag_false(chat_id)
         db_update_data_volume(chat_id, gb_amount)
 
-    emoji = db_get_emoji_from_two_tables(country)
-    ru_name = db_get_ru_name_from_two_tables(country)
-    prices = get_plan_prices(currency, chat_id, is_top_up)
+    emoji = db_get_emoji(country)
+    ru_name = db_get_ru_name(country)
+    prices = get_bundle_price_list(currency, chat_id, is_top_up)
     amount = prices[gb_amount]
     photo_url = db_get_pay_pic_link(country)
 
@@ -125,3 +130,5 @@ async def create_payment_link(callback, chat_id, emoji, ru_name, gb_amount, amou
         await Config.BOT.send_photo(chat_id, photo=photo_url, caption=caption, reply_markup=kb)
     else:
         await Config.BOT.send_message(chat_id, text=caption, reply_markup=kb)
+
+# get_bundle_data("turkey")

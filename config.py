@@ -45,3 +45,7 @@ class Config:
     TEST_PASSWORD2: str = "xC74cTl3pe7Lr8IxVTzd"
     PASSWORD1: str = "O0aeVibKLOm5d2CO8R5t"
     PASSWORD2: str = "YaTobt46ilslW7eO07mU"
+
+    # Monty API
+    MONTY_LOGIN = "esimunity"
+    MONTY_PASSWORD = "Qa4!Qt8)Nt9)"

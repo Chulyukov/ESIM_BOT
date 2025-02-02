@@ -2,15 +2,15 @@ import requests
 from xml.etree import ElementTree as ET
 
 
-def get_euro_to_rub_rate():
+def get_dollar_to_rub_rate():
     """
-    Получение курса евро к рублю с сайта Центробанка РФ.
+    Получение курса доллара к рублю с сайта Центробанка РФ.
 
     Returns:
-        float: Курс евро с добавлением надбавки в 2 рубля.
+        float: Курс доллара с добавлением надбавки в 4 рубля.
 
     Raises:
-        ValueError: Если курс евро не найден в XML-ответе.
+        ValueError: Если курс доллара не найден в XML-ответе.
         requests.RequestException: Если запрос не удался.
     """
     url = "https://www.cbr.ru/scripts/XML_daily.asp"
@@ -22,13 +22,13 @@ def get_euro_to_rub_rate():
         # Парсинг XML-ответа
         tree = ET.fromstring(response.content)
         for currency in tree.findall("Valute"):
-            if currency.find("CharCode").text == "EUR":
+            if currency.find("CharCode").text == "USD":
                 # Конвертация значения курса в float и добавление надбавки
                 rate = float(currency.find("Value").text.replace(",", "."))
-                return rate + 2
+                return rate + 4
 
         # Если валюта EUR не найдена
-        raise ValueError("Курс евро не найден в ответе Центробанка")
+        raise ValueError("Курс доллара не найден в ответе Центробанка")
 
     except requests.RequestException as e:
         print(f"Ошибка запроса к API Центробанка: {e}")
