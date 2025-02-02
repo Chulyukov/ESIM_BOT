@@ -57,7 +57,7 @@ async def choose_plan(callback: CallbackQuery):
     downloading_message = await callback.message.edit_text("*🚀 Подождите, загружаю данные...*")
     country = callback.data.split("country_")[1].replace("_", " ")
     db_update_data_country(callback.message.chat.id, country)
-    prices = get_bundle_price_list(country)
+    prices = await get_bundle_price_list(country)
 
     buttons = [
         InlineKeyboardButton(text=f"{gb} ГБ - {ceil(price)} RUB",
@@ -88,7 +88,7 @@ async def pay_rub(callback: CallbackQuery):
     gb_amount = callback.data.split("_")[1]
     price = callback.data.split("_")[-1]
     country = ' '.join(callback.data.split("_")[2:-1])
-    bundle_code = get_bundle_code(country, gb_amount).replace("_", "\_")
+    bundle_code = await get_bundle_code(country, gb_amount)
 
     emoji = db_get_emoji(country)
     ru_name = db_get_ru_name(country)
@@ -97,7 +97,7 @@ async def pay_rub(callback: CallbackQuery):
     await callback.message.answer(text=f"*Страна:* {emoji}{ru_name.title()}"
                                        f"\n*Цена:* {price} RUB"
                                        f"\n*Пакет интернета:* {gb_amount} GB"
-                                       f"\n*Код продукта:* {bundle_code}"
+                                       f"\n*Код продукта:* {bundle_code.replace("_", "\_")}"
                                        "\n\n🛑 Оплата временно недоступна, но вы можете приобрести нужный тариф,"
                                        f" обратившись в [службу заботы клиента]({Config.SUPPORT_LINK})."
                                        f" Просто перешлите это сообщение поддержке.")

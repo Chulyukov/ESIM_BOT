@@ -13,7 +13,7 @@ from db.db_queries import (
     db_get_ru_name, db_get_pay_pic_link, db_save_invoice_user
 )
 from currency_rate import get_dollar_to_rub_rate
-from monty_api import MontyApi
+from monty_api import MontyApiAsync
 from robokassa_api import generate_payment_link
 
 
@@ -29,13 +29,13 @@ def build_keyboard(buttons, layout):
     return kb.adjust(*layout).as_markup()
 
 
-def get_bundle_price_list(country):
+async def get_bundle_price_list(country):
     """Получение цен для тарифов по стране."""
     multiplier = get_dollar_to_rub_rate()
     processed_bundle_data = {}
 
-    monty = MontyApi()
-    bundle_data = monty.get_bundle_data(country)
+    monty = MontyApiAsync()
+    bundle_data = await monty.get_bundle_data(country)
 
     for gb_amount in [3, 5, 10, 20]:
         bundle_price = 10000
@@ -52,10 +52,10 @@ def get_bundle_price_list(country):
     return processed_bundle_data
 
 
-def get_bundle_code(country, gb_amount):
+async def get_bundle_code(country, gb_amount):
     """Получение bundle_code по стране, количеству ГБ."""
-    monty = MontyApi()
-    bundle_data = monty.get_bundle_data(country)
+    monty = MontyApiAsync()
+    bundle_data = await monty.get_bundle_data(country)
 
     bundle_price = 10000
     bundle_code = ""

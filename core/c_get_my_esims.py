@@ -8,7 +8,7 @@ from bnesim_api import BnesimApi
 from config import Config
 from core.helpful_methods import get_bundle_price_list, prepare_payment_order
 from db.db_queries import db_get_cli, db_get_hidden_esims, db_update_top_up_data_iccid_and_country
-from monty_api import MontyApi
+from monty_api import MontyApiAsync
 
 router = Router()
 
@@ -31,7 +31,7 @@ INSTALLATION_GUIDE = (
 async def get_my_esims(message: Message):
     # downloading_message = await message.answer("*🚀 Подождите, загружаю данные...*")
     chat_id = message.chat.id
-    monty = MontyApi()
+    monty = MontyApiAsync()
 
     # while iccids_map is None:
     #     await asyncio.sleep(1)
