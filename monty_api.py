@@ -34,7 +34,7 @@ class MontyApiAsync(metaclass=SingletonMeta):
         """Обновляет токен и сохраняет время его истечения."""
         self.access_token = await self._get_auth_token_directly()  # Используем прямой запрос
         self.headers["Access-Token"] = self.access_token
-        self.token_expiry = time.time() + 60 * 60  # Токен действует 60 минут
+        self.token_expiry = time.time() + 60 * 9  # Токен действует 9 минут
 
     async def _get_auth_token_directly(self) -> str:
         """Получает токен авторизации напрямую, без использования _request."""
