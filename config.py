@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 
@@ -9,10 +10,10 @@ class Config:
 
     # Токены телеграм-ботов
     TOKEN: str = "7210348872:AAGDZsDcTsAszxGEhCNBCmmZkbSRC5n868c"
-    TEST_TOKEN: str = "8101981246:AAGwNiazPZliWFFMItehFeFO8HCQ0fgIUJA"
+    TEST_TOKEN: str = "7822095603:AAGFODTXBko19KvG0syuPb3DLyF1s-qrtPk"
 
     # Создание объекта бота
-    BOT: Bot = Bot(TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
+    BOT: Bot = Bot(TEST_TOKEN, default=DefaultBotProperties(parse_mode='MARKDOWN'))
 
     # Ссылки на бота
     BOT_LINK: str = "https://t.me/esim_unity_bot"
@@ -39,6 +40,10 @@ class Config:
     WEBHOOK_PATH: str = "/payment-result"
     WEBHOOK_URL: str = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
     MERCHANT_LOGIN: str = "esimUnityTg"
+
+    # PayMaster
+    # PAYMASTER_TOKEN_TEST: str = "1744374395:TEST:335e7058b96a5de31833"
+    PAYMASTER_TOKEN_TEST: str = "1744374395:TEST:9ee08b8b1faacfed072c"
 
     # Пароли Robokassa
     TEST_PASSWORD1: str = "g26216mIRpoFvgKuWROg"

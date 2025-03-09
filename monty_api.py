@@ -1,5 +1,7 @@
 import time
+
 import httpx
+
 from config import Config
 from db.db_queries import db_insert_monty_countries, db_get_iso3_code
 
@@ -104,6 +106,50 @@ class MontyApiAsync(metaclass=SingletonMeta):
             "order_reference": uuid
         }
         await self._post("/Bundles", json=body)
+
+    async def get_necessary_bundle_code(self, country: str, gb_amount: str):
+        necessary_bundles = []
+
+        global_bundles = await self._get(  # Дождемся выполнения запроса
+            "/Bundles?page_size=100&page_number=1&bundle_category=global&sort_by=price_asc&reseller_admin_view=true"
+        )
+        for bundle in global_bundles["bundles"]:  # Теперь global_bundles - это результат запроса
+            if (bundle["gprs_limit"] == float(gb_amount)
+                    and bundle["validity"] == 30
+                    and (f"{gb_amount}GB" in bundle["bundle_name"] or f"{float(gb_amount) * 1024}MB")
+                    and country.capitalize() in bundle["country_name"]):
+                necessary_bundles.append(bundle)
+
+        region_bundles = await self._get(
+            "/Bundles?page_size=100&page_number=1&bundle_category=region&sort_by=price_asc&reseller_admin_view=true"
+        )
+        for bundle in region_bundles["bundles"]:
+            if (bundle["gprs_limit"] == float(gb_amount)
+                    and bundle["validity"] == 30
+                    and (f"{gb_amount}GB" in bundle["bundle_name"] or f"{float(gb_amount) * 1024}MB")
+                    and country.capitalize() in bundle["country_name"]):
+                necessary_bundles.append(bundle)
+
+        country_bundles = await self._get(
+            f"/Bundles?page_size=100&page_number=1&bundle_name={country}&sort_by=price_asc&reseller_admin_view=true"
+        )
+        for bundle in country_bundles["bundles"]:
+            if (bundle["gprs_limit"] == float(gb_amount)
+                    and bundle["validity"] == 30
+                    and (f"{gb_amount}GB" in bundle["bundle_name"] or f"{float(gb_amount) * 1024}MB")):
+                necessary_bundles.append(bundle)
+
+        subscriber_price = ""
+        bundle_price = 10000
+        bundle_code = ""
+        for necessary_bundle in necessary_bundles:
+            if bundle_price > necessary_bundle["reseller_retail_price"]:
+                bundle_price = necessary_bundle["reseller_retail_price"]
+                bundle_code = necessary_bundle["bundle_code"]
+                subscriber_price = necessary_bundle["subscriber_price"]
+
+        print(subscriber_price)
+        return bundle_code
 
     async def get_esim_info(self, uuid: str):
         """Получает информацию о eSIM по UUID."""

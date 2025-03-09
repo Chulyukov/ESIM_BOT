@@ -20,7 +20,7 @@ def db_add_user(chat_id, username, activation_datetime):
 
 
 def db_get_emoji(country):
-    """Получаем emoji из одной таблицы (либо countries, либо regions: зависит от того, где присутствует направление)"""
+    """Получаем emoji из countries"""
     result = execute_query("Ошибка при получении emoji",
                            "SELECT emoji FROM countries WHERE name = %s",
                            (country,))
@@ -28,8 +28,7 @@ def db_get_emoji(country):
 
 
 def db_get_ru_name(country):
-    """Получаем ru_name из одной таблицы
-    (либо countries, либо regions: зависит от того, где присутствует направление)"""
+    """Получаем ru_name из countries"""
     result = execute_query("Ошибка при получении emoji",
                            "SELECT ru_name FROM countries WHERE name = %s",
                            (country,))
@@ -39,7 +38,7 @@ def db_get_ru_name(country):
 def db_get_bnesim_products():
     """Получаем страны в таблицу"""
     result = execute_query("Ошибка при добавлении новой страны или при обновлении уже существующей",
-                           "SELECT product_id, country, volume, price FROM bnesim_products")
+                           "SELECT product_id, country, volume, price FROM yam_countries")
     return {row[0]: {"country": row[1], "volume": row[2], "price": row[3]} for row in result}
 
 
@@ -66,7 +65,7 @@ def db_insert_bnesim_products(products: dict):
 
     # Формируем запрос на вставку или обновление записей
     insert_update_query = """
-    INSERT INTO bnesim_products (product_id, country, volume, price)
+    INSERT INTO yam_countries (product_id, country, volume, price)
     VALUES (%s, %s, %s, %s)
     ON DUPLICATE KEY UPDATE
         country = VALUES(country),
@@ -84,7 +83,7 @@ def db_insert_bnesim_products(products: dict):
 
     # Формируем запрос на удаление записей, которых нет в новом наборе данных
     delete_query = """
-    DELETE FROM bnesim_products
+    DELETE FROM yam_countries
     WHERE product_id NOT IN (%s);
     """ % ','.join(['%s'] * len(product_ids))  # Формируем плейсхолдеры для списка product_ids
 
@@ -99,7 +98,7 @@ def db_insert_bnesim_products(products: dict):
 def db_get_price_data(country: str):
     """Получаем volume и price"""
     result = execute_query("Ошибка при получении volume и price",
-                           "SELECT volume, price FROM bnesim_products WHERE country = %s",
+                           "SELECT volume, price FROM yam_countries WHERE country = %s",
                            (country,))
     return {data[0]: {"price": data[1]} for data in result}
 
@@ -107,30 +106,8 @@ def db_get_price_data(country: str):
 def db_get_product_id(country, volume):
     """Получаем product_id"""
     result = execute_query("Ошибка при получении product_id",
-                           "SELECT product_id FROM bnesim_products WHERE country = %s AND volume = %s",
+                           "SELECT product_id FROM yam_countries WHERE country = %s AND volume = %s",
                            (country, volume,))[0][0]
-    return result if result else None
-
-
-def db_update_cli(chat_id, cli):
-    """Добавлям cli"""
-    execute_query("Ошибка при добавлении cli",
-                  "UPDATE users SET cli = %s WHERE chat_id = %s",
-                  (cli, chat_id,))
-
-
-def db_get_cli(chat_id):
-    """Получаем cli"""
-    result = execute_query("Ошибка при получении cli",
-                           "SELECT cli FROM users WHERE chat_id = %s",
-                           (chat_id,))[0][0]
-    return result if result else None
-
-
-def db_get_all_cli():
-    """Получаем все имеющиеся cli"""
-    result = execute_query("Ошибка при получении всех cli",
-                           "SELECT chat_id, cli FROM users WHERE cli IS NOT NULL")
     return result if result else None
 
 
@@ -194,114 +171,11 @@ def db_get_hidden_esims(chat_id):
     return json.loads(result) if not isinstance(result, NoneType) else None
 
 
-def db_save_invoice_user(invoice_id, chat_id, username, date):
-    execute_query("Ошибка при добавлении записи в payments",
-                  "INSERT INTO payments (invoice_id, chat_id, username, date) VALUES (%s, %s, %s, %s)",
-                  (invoice_id, chat_id, username, date,))
-
-
-def db_get_chat_id_by_invoice_id(invoice_id):
-    result = execute_query("Ошибка при получении chat_id по invoice_id",
-                           "SELECT chat_id FROM payments WHERE invoice_id = %s",
-                           (invoice_id,))[0][0]
-    return result if result else None
-
-
-def db_get_username_by_invoice_id(invoice_id):
-    result = execute_query("Ошибка при получении username по invoice_id",
-                           "SELECT username FROM payments WHERE invoice_id = %s",
-                           (invoice_id,))[0][0]
-    return result if result else None
-
-
-def db_update_payment_status(invoice_id, status):
-    execute_query("Ошибка при изменении статуса в payments",
-                  "UPDATE payments SET status = %s WHERE invoice_id = %s",
-                  (status, invoice_id,))
-
-
-def db_clean_top_up_data(chat_id):
-    """Очищаем users.data"""
-    execute_query("Ошибка при очищении users.data",
-                  "UPDATE users SET top_up_data = '{}' WHERE chat_id = %s",
-                  (chat_id,))
-
-
-def db_update_top_up_data_iccid_and_country(chat_id, iccid, country):
-    """Добавлям users.data.iccid и users.data.country"""
-    execute_query("Ошибка при добавлении users.data.iccid",
-                  "UPDATE users"
-                  " SET top_up_data = JSON_SET(IFNULL(top_up_data, '{}'), '$.iccid', %s, '$.country', %s)"
-                  " WHERE chat_id = %s",
-                  (iccid, country, chat_id,))
-
-
-def db_update_top_up_data_volume(chat_id, volume):
-    """Добавлям users.data.volume"""
-    execute_query("Ошибка при добавлении users.data.volume",
-                  "UPDATE users"
-                  " SET top_up_data = JSON_SET(IFNULL(top_up_data, '{}'), '$.volume', %s) WHERE chat_id = %s",
-                  (volume, chat_id,))
-
-
-def db_update_top_up_flag_true(chat_id):
-    """Выставляем top_up_flag = 1"""
-    execute_query("Ошибка при добавлении top_up_flag",
-                  "UPDATE users SET top_up_flag = 1 WHERE chat_id = %s",
-                  (chat_id,))
-
-
-def db_update_top_up_flag_false(chat_id):
-    """Выставляем top_up_flag = 0"""
-    execute_query("Ошибка при выставлении top_up_flag = 0",
-                  "UPDATE users SET top_up_flag = 0 WHERE chat_id = %s",
-                  (chat_id,))
-
-
-def db_get_top_up_flag(chat_id):
-    """Получаем top_up_flag"""
-    result = execute_query("Ошибка при получении top_up_flag",
-                           "SELECT top_up_flag FROM users WHERE chat_id = %s",
-                           (chat_id,))[0][0]
-    return result if result else None
-
-
-def db_get_top_up_data_country(chat_id):
-    """Получаем users.data.country"""
-    result = json.loads(execute_query("Ошибка при получении users.data.country",
-                                      "SELECT top_up_data FROM users WHERE chat_id = %s",
-                                      (chat_id,))[0][0])
-    return result["country"].replace("\"", "") if result else None
-
-
-def db_get_all_top_up_data(chat_id):
-    """Получаем users.data.iccid & country & volume"""
-    result = execute_query("Ошибка при получении users.data.iccid",
-                           "SELECT top_up_data FROM users WHERE chat_id = %s",
-                           (chat_id,))[0][0]
-
-    return json.loads(result) if result else None
-
-
 def db_get_username(chat_id):
     result = execute_query("Ошибка при получении username",
                            "SELECT username FROM users WHERE chat_id = %s",
                            (chat_id,))[0][0]
     return result if result else None
-
-
-def db_get_regions():
-    """Получаем регионы и их эмодзи, пропуская pages_to_skip * 20 стран"""
-    query = """
-    SELECT name, ru_name, emoji
-    FROM regions
-    WHERE name != 'global'
-    ORDER BY name
-    """
-
-    result = execute_query("Ошибка при получении регионов", query, ())
-
-    return [(row[0], row[1], row[2]) for row in result] if result else []
 
 
 def db_get_20_countries(pages_to_skip):
@@ -337,14 +211,6 @@ def db_get_all_coincidences_by_search(user_text):
     for country in result:
         countries_list[country[0]] = {"ru_name": country[1], "emoji": country[2]}
     return countries_list
-
-
-def db_get_pay_pic_link(name):
-    """Получаем pay_pic_link"""
-    result = execute_query("Ошибка при получении pay_pic_link",
-                           "SELECT pay_pic_link FROM countries WHERE name = %s",
-                           (name,))
-    return result[0][0] if result else None
 
 
 def db_insert_monty_countries(country, iso3_code):

@@ -1,6 +1,8 @@
 import json
+
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
+
 from db.db_queries import db_get_hidden_esims, db_update_hidden_esims
 
 router = Router()

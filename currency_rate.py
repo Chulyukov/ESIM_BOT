@@ -1,5 +1,6 @@
-import requests
 from xml.etree import ElementTree as ET
+
+import requests
 
 
 def get_dollar_to_rub_rate():
