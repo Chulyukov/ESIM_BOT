@@ -159,7 +159,7 @@ async def successful_payment(message: types.Message, state: FSMContext):
         caption=(
             "*🎊 Поздравляем с приобретением вашей первой eSIM!*"
             f"\n\n📛 *Название вашей eSIM:* `{user_data['country'].title()} - {user_data['uuid'][-4:]}`"
-            f"\n🔗 *Ссылка для установки на iOS:* https://esimsetup.apple.com/esim_qrcode_provisioning?carddata={esim_info['activation_code']}"
+            f"\n🔗 *Ссылка для установки на iOS:* https://esimsetup.apple.com/esim\_qrcode\_provisioning?carddata={esim_info['activation_code']}"
             "\n\n📖 *Инструкции по установке:*"
             " [iPhone](https://telegra.ph/Kak-podklyuchit-eSIM-na-iPhone-07-27)"
             " | [Android](https://telegra.ph/Kak-podklyuchit-eSIM-na-Android-08-18)"

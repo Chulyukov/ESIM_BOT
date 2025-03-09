@@ -148,7 +148,6 @@ class MontyApiAsync(metaclass=SingletonMeta):
                 bundle_code = necessary_bundle["bundle_code"]
                 subscriber_price = necessary_bundle["subscriber_price"]
 
-        print(subscriber_price)
         return bundle_code
 
     async def get_esim_info(self, uuid: str):
